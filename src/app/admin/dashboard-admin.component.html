@@ -1,0 +1,127 @@
+<div class="space-y-6">
+
+  <!-- Header Section -->
+  <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-[#0c3d65] text-3xl">dashboard</span>
+      <div>
+        <h2 class="text-xl font-bold text-[#0c3d65]">Panel del Administrador</h2>
+        <p class="text-xs text-[#42474e]">Supervisa en tiempo real las estadísticas operativas de la clínica.</p>
+      </div>
+    </div>
+    <button (click)="cargarStats()" class="bg-[#0c3d65] hover:bg-[#2b547e] text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+      <span class="material-symbols-outlined text-base" [class.animate-spin]="isLoading()">sync</span>
+      <span>Sincronizar Datos</span>
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="bg-white rounded-2xl border border-[#c2c7cf] p-12 flex flex-col items-center justify-center gap-3 shadow-sm">
+      <div class="w-8 h-8 border-4 border-[#0c3d65] border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-sm text-[#42474e]">Consolidando métricas...</p>
+    </div>
+  } @else {
+    <!-- Stats Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      
+      <!-- Card: Medicos -->
+      <div class="bg-white p-6 rounded-2xl border border-[#c2c7cf] shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+        <div class="flex items-center justify-between">
+          <span class="material-symbols-outlined text-blue-600 bg-blue-50 p-2.5 rounded-xl">medical_services</span>
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Colegiados</span>
+        </div>
+        <h3 class="text-xs font-bold text-slate-500 uppercase mt-4">Médicos Activos</h3>
+        <p class="text-3xl font-black text-[#0c3d65] mt-1">{{ stats()?.totalMedicos }}</p>
+      </div>
+
+      <!-- Card: Pacientes -->
+      <div class="bg-white p-6 rounded-2xl border border-[#c2c7cf] shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+        <div class="flex items-center justify-between">
+          <span class="material-symbols-outlined text-emerald-600 bg-emerald-50 p-2.5 rounded-xl">group</span>
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Registrados</span>
+        </div>
+        <h3 class="text-xs font-bold text-slate-500 uppercase mt-4">Pacientes Totales</h3>
+        <p class="text-3xl font-black text-[#0c3d65] mt-1">{{ stats()?.totalPacientes }}</p>
+      </div>
+
+      <!-- Card: Citas de Hoy -->
+      <div class="bg-white p-6 rounded-2xl border border-[#c2c7cf] shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-amber-500"></div>
+        <div class="flex items-center justify-between">
+          <span class="material-symbols-outlined text-amber-600 bg-amber-50 p-2.5 rounded-xl">calendar_today</span>
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fecha Actual</span>
+        </div>
+        <h3 class="text-xs font-bold text-slate-500 uppercase mt-4">Citas Programadas Hoy</h3>
+        <p class="text-3xl font-black text-[#0c3d65] mt-1">{{ stats()?.totalCitasHoy }}</p>
+      </div>
+
+      <!-- Card: Citas Pendientes -->
+      <div class="bg-white p-6 rounded-2xl border border-[#c2c7cf] shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-1 bg-violet-500"></div>
+        <div class="flex items-center justify-between">
+          <span class="material-symbols-outlined text-violet-600 bg-violet-50 p-2.5 rounded-xl">pending_actions</span>
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">En Espera</span>
+        </div>
+        <h3 class="text-xs font-bold text-slate-500 uppercase mt-4">Citas en Pendientes</h3>
+        <p class="text-3xl font-black text-[#0c3d65] mt-1">{{ stats()?.totalCitasPendientes }}</p>
+      </div>
+
+    </div>
+
+    <!-- Recent Appointments Section -->
+    <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm overflow-hidden">
+      <div class="p-6 border-b border-[#c2c7cf]/60">
+        <h3 class="font-bold text-[#0c3d65] text-base flex items-center gap-2">
+          <span class="material-symbols-outlined">history</span> Registro de Actividad: Citas Recientes
+        </h3>
+      </div>
+
+      @if (stats()?.citasRecientes?.length === 0) {
+        <p class="text-xs text-gray-500 text-center py-8">No se registran citas en el sistema.</p>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-50 text-[10px] font-bold uppercase tracking-wider text-[#0c3d65] border-b border-[#c2c7cf]/60">
+                <th class="p-4">Cita ID</th>
+                <th class="p-4">Fecha y Hora</th>
+                <th class="p-4">Paciente</th>
+                <th class="p-4">Médico Asignado</th>
+                <th class="p-4">Especialidad</th>
+                <th class="p-4">Estado</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#c2c7cf]/40">
+              @for (c of stats()?.citasRecientes; track c.idCita) {
+                <tr class="hover:bg-gray-50/50 transition-colors text-xs">
+                  <td class="p-4 font-bold text-slate-700">#{{ c.idCita }}</td>
+                  <td class="p-4">
+                    <div class="flex flex-col">
+                      <span class="font-semibold text-slate-800">{{ c.fecha }}</span>
+                      <span class="text-[10px] text-[#0c3d65] font-bold mt-0.5">{{ c.hora.substring(0, 5) }}</span>
+                    </div>
+                  </td>
+                  <td class="p-4 font-semibold text-slate-800">{{ c.nombrePaciente }}</td>
+                  <td class="p-4 text-slate-700">Dr. {{ c.nombreMedico }}</td>
+                  <td class="p-4 font-semibold text-[#0c3d65]">{{ c.especialidadMedico }}</td>
+                  <td class="p-4">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+                      [class.bg-amber-50]="c.estadoCita === 'PENDIENTE'" [class.text-amber-700]="c.estadoCita === 'PENDIENTE'"
+                      [class.bg-emerald-50]="c.estadoCita === 'ATENDIDA'" [class.text-emerald-700]="c.estadoCita === 'ATENDIDA'"
+                      [class.bg-red-50]="c.estadoCita === 'CANCELADA'" [class.text-red-700]="c.estadoCita === 'CANCELADA'"
+                      [class.bg-violet-50]="c.estadoCita === 'POSTERGADA'" [class.text-violet-700]="c.estadoCita === 'POSTERGADA'">
+                      {{ c.estadoCita }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+</div>

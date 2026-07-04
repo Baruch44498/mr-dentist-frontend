@@ -1,0 +1,198 @@
+<div class="min-h-screen bg-[#f9f9ff] flex">
+  
+  <!-- Sidebar -->
+  <app-sideBar class="print:hidden"></app-sideBar>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow pl-64 print:pl-0 min-h-screen flex flex-col">
+    
+    <!-- Top Navbar -->
+    <header class="h-16 bg-white border-b border-[#c2c7cf] flex items-center justify-between px-8 shadow-sm print:hidden">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-[#0c3d65] text-2xl">
+          @if (userRole === 'ADMIN') {
+            admin_panel_settings
+          } @else if (userRole === 'MEDICO') {
+            medical_services
+          } @else {
+            patient_list
+          }
+        </span>
+        <h1 class="font-bold text-lg text-[#0c3d65] tracking-tight">
+          Panel de Control - {{ userRole }}
+        </h1>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-[#42474e] font-medium">Bienvenido, <strong class="text-[#0c3d65]">{{ userName }}</strong></span>
+        <div class="w-8 h-8 rounded-full bg-[#0c3d65] text-white flex items-center justify-center font-bold text-xs">
+          {{ userName.charAt(0).toUpperCase() }}
+        </div>
+      </div>
+    </header>
+
+    <!-- Dashboard Body -->
+    <section class="p-8 print:p-0 flex-grow">
+      
+      <!-- Welcome Card (Solo se muestra en el panel principal) -->
+      @if (currentPath === '/admin/dashboard' || currentPath === '/medico/dashboard' || currentPath === '/paciente/dashboard') {
+        <div class="bg-white rounded-2xl border border-[#c2c7cf] p-6 shadow-sm mb-6 relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#0c3d65] to-[#3a6470]"></div>
+          <h2 class="text-xl font-bold text-[#0c3d65] mb-2">¡Hola, {{ userName }}!</h2>
+          <p class="text-sm text-[#42474e]">
+            Bienvenido al portal clínico de Mr Dentist. Aquí puedes gestionar toda tu información de manera rápida y segura.
+          </p>
+        </div>
+      }
+
+      <!-- Role-Specific Content -->
+      @if (userRole === 'ADMIN') {
+        @if (currentPath === '/admin/dashboard') {
+          <app-dashboard-admin></app-dashboard-admin>
+        } @else if (currentPath === '/admin/medicos') {
+          <app-crud-medicos></app-crud-medicos>
+        } @else if (currentPath === '/admin/pacientes') {
+          <app-crud-pacientes></app-crud-pacientes>
+        } @else if (currentPath === '/admin/especialidades') {
+          <app-crud-especialidades></app-crud-especialidades>
+        } @else if (currentPath === '/admin/citas') {
+          <div class="bg-white p-12 rounded-2xl border border-[#c2c7cf] text-center shadow-sm">
+            <span class="material-symbols-outlined text-5xl text-[#0c3d65] mb-2">calendar_month</span>
+            <h3 class="text-lg font-bold text-[#0c3d65]">Gestión de Citas</h3>
+            <p class="text-sm text-[#42474e] mt-1">El módulo de gestión de citas estará disponible próximamente.</p>
+          </div>
+        } @else if (currentPath === '/admin/settings') {
+          <app-settings></app-settings>
+        } @else if (currentPath === '/paciente/perfil') {
+          <app-perfil></app-perfil>
+        }
+      } @else if (userRole === 'MEDICO') {
+        @if (currentPath === '/medico/dashboard') {
+          <app-agenda-medico></app-agenda-medico>
+        } @else if (currentPath === '/medico/pacientes') {
+          <app-pacientes-medico></app-pacientes-medico>
+        } @else if (currentPath === '/medico/historiales') {
+          <app-historiales-medicos></app-historiales-medicos>
+        } @else if (currentPath === '/paciente/perfil') {
+          <app-perfil></app-perfil>
+        } @else {
+          <!-- Otros componentes del médico aquí -->
+          <div class="bg-white p-12 rounded-2xl border border-[#c2c7cf] text-center shadow-sm">
+            <span class="material-symbols-outlined text-5xl text-[#0c3d65] mb-2">description</span>
+            <h3 class="text-lg font-bold text-[#0c3d65]">Módulo Clínico</h3>
+            <p class="text-sm text-[#42474e] mt-1">Esta sección del portal médico estará disponible próximamente.</p>
+          </div>
+        }
+      } @else {
+        <!-- PACIENTE -->
+        @if (currentPath === '/paciente/reservar') {
+          <app-reservar-cita-paciente></app-reservar-cita-paciente>
+        } @else if (currentPath === '/paciente/dashboard') {
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Mi Próxima Cita Dinámica -->
+            <div class="bg-white p-6 rounded-xl border border-[#c2c7cf] shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 class="font-bold text-lg text-[#0c3d65] mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined">event</span> Mi Próxima Cita
+                </h3>
+                
+                @if (proximaCitaPaciente()) {
+                  <div class="bg-[#f0f3ff] p-4 rounded-xl border border-[#dee8ff] flex items-center justify-between">
+                    <div>
+                      <p class="font-bold text-[#0c3d65] text-base">{{ proximaCitaPaciente()?.fecha }}</p>
+                      <p class="text-sm text-[#42474e]">Dr. {{ proximaCitaPaciente()?.nombreMedico }} · {{ proximaCitaPaciente()?.especialidadMedico }}</p>
+                      <p class="text-xs text-gray-500 mt-1 italic">Motivo: "{{ proximaCitaPaciente()?.motivoCita }}"</p>
+                    </div>
+                    <span class="text-sm font-bold text-[#0c3d65] bg-[#dee8ff] px-3 py-1.5 rounded-lg">
+                      {{ proximaCitaPaciente()?.hora?.substring(0, 5) }}
+                    </span>
+                  </div>
+                } @else {
+                  <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center py-6">
+                    <span class="material-symbols-outlined text-gray-400 text-2xl mb-1">event_busy</span>
+                    <p class="text-xs font-semibold text-gray-500">No tienes citas próximas agendadas.</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Reservar Cita Banner -->
+            <div class="bg-white p-6 rounded-xl border border-[#c2c7cf] shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 class="font-bold text-lg text-[#0c3d65] mb-2 flex items-center gap-2">
+                  <span class="material-symbols-outlined">add_circle</span> ¿Necesitas una nueva cita?
+                </h3>
+                <p class="text-sm text-[#42474e]">Reserva una cita con nuestros especialistas de forma rápida y sencilla seleccionando el horario que más te convenga.</p>
+              </div>
+              <button (click)="irAReservar()" class="mt-4 w-full bg-[#0c3d65] text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-[#2b547e] transition-colors cursor-pointer flex items-center justify-center gap-1">
+                <span class="material-symbols-outlined text-sm">calendar_month</span>
+                <span>Reservar Cita Ahora</span>
+              </button>
+            </div>
+
+            <!-- Historial Breve en Dashboard -->
+            <div class="bg-white p-6 rounded-xl border border-[#c2c7cf] shadow-sm md:col-span-2">
+              <h3 class="font-bold text-lg text-[#0c3d65] mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined">history</span> Resumen de Citas
+              </h3>
+              @if (pacienteCitas().length === 0) {
+                <p class="text-xs text-gray-500 text-center py-6">No tienes historial de citas en la clínica.</p>
+              } @else {
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr class="bg-gray-50 font-bold uppercase tracking-wider text-[#0c3d65] border-b border-[#c2c7cf]/40">
+                        <th class="p-3">Fecha</th>
+                        <th class="p-3">Hora</th>
+                        <th class="p-3">Odontólogo</th>
+                        <th class="p-3">Especialidad</th>
+                        <th class="p-3">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-[#c2c7cf]/30">
+                      @for (c of pacienteCitas().slice(0, 5); track c.idCita) {
+                        <tr class="hover:bg-gray-50/50 transition-colors">
+                          <td class="p-3 font-semibold text-slate-800">{{ c.fecha }}</td>
+                          <td class="p-3 font-semibold text-[#0c3d65]">{{ c.hora.substring(0, 5) }}</td>
+                          <td class="p-3 text-slate-700">Dr. {{ c.nombreMedico }}</td>
+                          <td class="p-3 text-slate-700">{{ c.especialidadMedico }}</td>
+                          <td class="p-3">
+                            <span class="px-2 py-0.5 rounded font-bold text-[10px]"
+                              [class.bg-amber-50]="c.estadoCita === 'PENDIENTE'" [class.text-amber-700]="c.estadoCita === 'PENDIENTE'"
+                              [class.bg-emerald-50]="c.estadoCita === 'ATENDIDA'" [class.text-emerald-700]="c.estadoCita === 'ATENDIDA'"
+                              [class.bg-red-50]="c.estadoCita === 'CANCELADA'" [class.text-red-700]="c.estadoCita === 'CANCELADA'"
+                              [class.bg-violet-50]="c.estadoCita === 'POSTERGADA'" [class.text-violet-700]="c.estadoCita === 'POSTERGADA'">
+                              {{ c.estadoCita }}
+                            </span>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+            </div>
+
+          </div>
+        } @else if (currentPath === '/paciente/historial') {
+          <app-historial-paciente></app-historial-paciente>
+        } @else if (currentPath.startsWith('/paciente/historial/detalle')) {
+          <app-detalle-historial-paciente></app-detalle-historial-paciente>
+        } @else if (currentPath === '/paciente/recetas') {
+          <app-recetas-paciente></app-recetas-paciente>
+        } @else if (currentPath === '/paciente/perfil') {
+          <app-perfil></app-perfil>
+        } @else {
+          <!-- Otros componentes del paciente aquí -->
+          <div class="bg-white p-12 rounded-2xl border border-[#c2c7cf] text-center shadow-sm">
+            <span class="material-symbols-outlined text-5xl text-[#0c3d65] mb-2">medical_information</span>
+            <h3 class="text-lg font-bold text-[#0c3d65]">Módulo del Paciente</h3>
+            <p class="text-sm text-[#42474e] mt-1">Esta sección del portal estará disponible próximamente.</p>
+          </div>
+        }
+      }
+
+
+    </section>
+  </main>
+</div>

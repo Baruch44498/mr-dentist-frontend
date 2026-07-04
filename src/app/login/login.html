@@ -1,0 +1,200 @@
+<section class="min-h-screen flex flex-col relative overflow-x-hidden bg-[#f9f9ff]">
+
+  <!-- Background dot pattern -->
+  <div class="fixed inset-0 z-0 pointer-events-none opacity-[0.04]"
+       style="background-image: radial-gradient(#0c3d65 1px, transparent 1px); background-size: 24px 24px;"></div>
+
+  <!-- Decorative gradient blobs -->
+  <div class="fixed top-0 left-0 w-96 h-96 rounded-full pointer-events-none z-0"
+       style="background: radial-gradient(circle, rgba(12,61,101,0.08) 0%, transparent 70%); transform: translate(-30%, -30%);"></div>
+  <div class="fixed bottom-0 right-0 w-96 h-96 rounded-full pointer-events-none z-0"
+       style="background: radial-gradient(circle, rgba(58,100,112,0.08) 0%, transparent 70%); transform: translate(30%, 30%);"></div>
+
+  <!-- Main Content -->
+  <main class="grow flex items-center justify-center px-4 py-10 md:px-16 relative z-10">
+
+    <!-- Login Card -->
+    <div class="bg-white rounded-2xl shadow-xl border border-[#c2c7cf] w-full max-w-md relative overflow-hidden">
+
+      <!-- Top accent bar -->
+      <div class="h-1.5 w-full"
+           style="background: linear-gradient(90deg, #0c3d65 0%, #3a6470 50%, #39618c 100%);"></div>
+
+      <div class="p-8">
+
+        <!-- Logo + Brand Header -->
+        <div class="flex flex-col items-center mb-6">
+          <div class="relative mb-4 group">
+            <div class="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                 style="background: radial-gradient(circle, rgba(12,61,101,0.12) 0%, transparent 70%); transform: scale(1.3);"></div>
+            <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-[#dee8ff] shadow-lg relative"
+                 style="box-shadow: 0 8px 24px rgba(12,61,101,0.18);">
+              <img
+                src="mr_dentist.jpg"
+                alt="Mr Dentist Logo"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+            </div>
+          </div>
+          <h1 class="text-2xl font-bold text-[#0c3d65] tracking-tight">Mr Dentist</h1>
+          <p class="text-sm text-[#42474e] mt-1">Centro Odontológico · Sistema Integral</p>
+
+          <!-- Role indicators -->
+          <div class="mt-3 flex items-center gap-2 flex-wrap justify-center">
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#dee8ff] text-[#0c3d65]">
+              <span class="material-symbols-outlined text-sm">admin_panel_settings</span>
+              Admin
+            </span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700">
+              <span class="material-symbols-outlined text-sm">medical_services</span>
+              Médico
+            </span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-violet-50 text-violet-700">
+              <span class="material-symbols-outlined text-sm">person</span>
+              Paciente
+            </span>
+          </div>
+
+          <div class="mt-3 flex items-center gap-2">
+            <div class="h-px w-10 bg-[#c2c7cf]"></div>
+            <span class="text-xs text-[#73777f] font-medium uppercase tracking-widest">Iniciar Sesión</span>
+            <div class="h-px w-10 bg-[#c2c7cf]"></div>
+          </div>
+        </div>
+
+        <!-- Error message -->
+        @if (errorMessage()) {
+          <div class="mb-4 flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 animate-modal-in">
+            <span class="material-symbols-outlined text-lg flex-shrink-0 mt-0.5">error</span>
+            <p class="text-sm font-medium">{{ errorMessage() }}</p>
+          </div>
+        }
+
+        <!-- Form -->
+        <form (ngSubmit)="onSubmit()" class="space-y-4">
+
+          <!-- Email -->
+          <div>
+            <label class="block text-sm font-semibold text-[#111c2c] mb-1.5" for="login-email">
+              Correo Electrónico
+            </label>
+            <div class="relative group">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#73777f] text-[20px] transition-colors group-focus-within:text-[#0c3d65]">
+                mail
+              </span>
+              <input
+                id="login-email"
+                name="email"
+                type="email"
+                [(ngModel)]="email"
+                placeholder="usuario@ejemplo.com"
+                required
+                class="w-full pl-10 pr-4 py-2.5 bg-[#f9f9ff] border border-[#c2c7cf] rounded-lg text-[#111c2c] placeholder-[#73777f]/60 text-sm transition-all duration-200 outline-none focus:border-[#0c3d65] focus:ring-2 focus:ring-[#0c3d65]/20"
+              />
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block text-sm font-semibold text-[#111c2c] mb-1.5" for="login-password">
+              Contraseña
+            </label>
+            <div class="relative group">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#73777f] text-[20px] transition-colors group-focus-within:text-[#0c3d65]">
+                lock
+              </span>
+              <input
+                id="login-password"
+                name="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                [(ngModel)]="password"
+                placeholder="••••••••"
+                required
+                class="w-full pl-10 pr-10 py-2.5 bg-[#f9f9ff] border border-[#c2c7cf] rounded-lg text-[#111c2c] placeholder-[#73777f]/60 text-sm transition-all duration-200 outline-none focus:border-[#0c3d65] focus:ring-2 focus:ring-[#0c3d65]/20"
+              />
+              <button
+                type="button"
+                (click)="togglePassword()"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-[#73777f] hover:text-[#0c3d65] transition-colors cursor-pointer"
+                [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              >
+                <span class="material-symbols-outlined text-[20px]">
+                  {{ showPassword() ? 'visibility_off' : 'visibility' }}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Remember + Forgot -->
+          <div class="flex items-center justify-between pt-1">
+            <label class="flex items-center gap-2 cursor-pointer group">
+              <input
+                id="remember-me"
+                name="remember-me"
+                type="checkbox"
+                [(ngModel)]="rememberMe"
+                class="w-4 h-4 rounded border-[#c2c7cf] text-[#0c3d65] focus:ring-[#0c3d65]/30 cursor-pointer accent-[#0c3d65]"
+              />
+              <span class="text-sm text-[#42474e] group-hover:text-[#111c2c] transition-colors">Recordarme</span>
+            </label>
+            <a
+              href="#"
+              class="text-sm font-semibold text-[#0c3d65] hover:text-[#2b547e] hover:underline decoration-[#0c3d65] transition-all duration-200"
+            >
+              ¿Olvidaste tu contraseña?
+            </a>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-2">
+            <button
+              id="login-submit"
+              type="submit"
+              [disabled]="isLoading()"
+              class="w-full flex justify-center items-center gap-2 py-3 px-6 rounded-lg text-sm font-semibold text-white transition-all duration-200 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed cursor-pointer"
+              style="background: linear-gradient(135deg, #0c3d65 0%, #2b547e 100%); box-shadow: 0 4px 14px rgba(12,61,101,0.35);"
+            >
+              @if (isLoading()) {
+                <span class="material-symbols-outlined text-[18px] animate-spin">autorenew</span>
+                <span>Iniciando sesión...</span>
+              } @else {
+                <span>Acceder al Portal</span>
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+              }
+            </button>
+          </div>
+
+        </form>
+
+        <!-- Register Link -->
+        <div class="mt-6 text-center">
+          <p class="text-sm text-[#42474e]">
+            ¿Eres paciente nuevo?
+            <a
+              routerLink="/register"
+              class="font-bold text-[#0c3d65] hover:text-[#2b547e] hover:underline decoration-[#0c3d65] ml-1 transition-all duration-200"
+            >
+              Regístrate aquí
+            </a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full py-6 px-4 md:px-16 flex flex-col md:flex-row justify-between items-center gap-4 bg-[#f0f3ff] border-t border-[#c2c7cf] relative z-10">
+    <div class="flex flex-col items-center md:items-start gap-1">
+      <span class="font-bold text-[#0c3d65] text-base">Mr Dentist</span>
+      <span class="text-xs text-[#42474e]">© 2024 Mr Dentist Centro Odontológico. Todos los derechos reservados.</span>
+    </div>
+    <nav class="flex flex-wrap justify-center gap-6">
+      <a class="text-xs text-[#42474e] hover:text-[#0c3d65] hover:underline transition-all duration-300" href="#">Política de Privacidad</a>
+      <a class="text-xs text-[#42474e] hover:text-[#0c3d65] hover:underline transition-all duration-300" href="#">Términos de Servicio</a>
+      <a class="text-xs text-[#42474e] hover:text-[#0c3d65] hover:underline transition-all duration-300" href="#">Soporte</a>
+      <a class="text-xs text-[#42474e] hover:text-[#0c3d65] hover:underline transition-all duration-300" href="#">Urgencias</a>
+    </nav>
+  </footer>
+
+</section>

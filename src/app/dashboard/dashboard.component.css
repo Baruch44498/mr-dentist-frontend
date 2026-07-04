@@ -1,0 +1,5 @@
+/* Estilos personalizados para el Dashboard */
+:host {
+  display: block;
+  width: 100%;
+}

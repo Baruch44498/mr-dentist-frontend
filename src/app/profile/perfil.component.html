@@ -1,0 +1,187 @@
+<div class="space-y-6">
+  <!-- Toast Notification -->
+  @if (toastMessage()) {
+    <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 border animate-modal-in"
+      [class.bg-emerald-50]="toastType() === 'success'" [class.border-emerald-200]="toastType() === 'success'" [class.text-emerald-800]="toastType() === 'success'"
+      [class.bg-red-50]="toastType() === 'error'" [class.border-red-200]="toastType() === 'error'" [class.text-red-800]="toastType() === 'error'">
+      <span class="material-symbols-outlined text-lg">
+        {{ toastType() === 'success' ? 'check_circle' : 'error' }}
+      </span>
+      <span class="text-sm font-semibold">{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Header Card -->
+  <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 flex items-center gap-3">
+    <span class="material-symbols-outlined text-[#0c3d65] text-3xl">manage_accounts</span>
+    <div>
+      <h2 class="text-xl font-bold text-[#0c3d65]">Configuración de Mi Perfil</h2>
+      <p class="text-xs text-[#42474e]">Administra tu información personal, correo de contacto y contraseña del portal.</p>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="bg-white rounded-2xl border border-[#c2c7cf] p-12 flex flex-col items-center justify-center gap-3 shadow-sm">
+      <div class="w-8 h-8 border-4 border-[#0c3d65] border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-sm text-[#42474e]">Cargando tu perfil...</p>
+    </div>
+  } @else if (profileData()) {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Left Column: Avatar & Summary Box -->
+      <div class="space-y-6">
+        <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 text-center space-y-4 relative overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-[#0c3d65] to-[#3a6470]"></div>
+          
+          <!-- Large Avatar Circle -->
+          <div class="pt-4 flex justify-center">
+            <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-[#0c3d65] to-[#2b547e] text-white flex items-center justify-center font-bold text-3xl shadow-md border-4 border-white select-none">
+              {{ formNombres().charAt(0).toUpperCase() }}{{ formApellidos().charAt(0).toUpperCase() }}
+            </div>
+          </div>
+
+          <div>
+            <h3 class="font-bold text-lg text-slate-800 tracking-tight leading-snug">{{ formNombres() }} {{ formApellidos() }}</h3>
+            <span class="inline-block mt-1 px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full"
+              [class.bg-[#dee8ff]]="role() === 'PACIENTE'" [class.text-[#0c3d65]]="role() === 'PACIENTE'"
+              [class.bg-emerald-50]="role() === 'MEDICO'" [class.text-emerald-700]="role() === 'MEDICO'">
+              {{ role() }}
+            </span>
+          </div>
+
+          <!-- Quick User details -->
+          <div class="border-t border-slate-100 pt-4 space-y-3.5 text-xs text-left text-[#42474e]">
+            <div class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-[#0c3d65] text-base">badge</span>
+              <div>
+                <p class="text-[9px] font-bold text-slate-400 uppercase leading-none">DNI / Documento</p>
+                <p class="font-semibold text-slate-800 mt-0.5">{{ formDni() }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-[#0c3d65] text-base">mail</span>
+              <div>
+                <p class="text-[9px] font-bold text-slate-400 uppercase leading-none">Correo electrónico</p>
+                <p class="font-semibold text-slate-800 mt-0.5">{{ formCorreo() }}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+              <span class="material-symbols-outlined text-[#0c3d65] text-base">call</span>
+              <div>
+                <p class="text-[9px] font-bold text-slate-400 uppercase leading-none">Teléfono registrado</p>
+                <p class="font-semibold text-slate-800 mt-0.5">{{ formTelefono() || 'No registrado' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Doctor Professional Badges -->
+          @if (role() === 'MEDICO') {
+            <div class="border-t border-slate-100 pt-4 space-y-2">
+              <div class="bg-[#f0f3ff] p-3 rounded-xl border border-[#dee8ff] text-left text-xs">
+                <span class="text-[#0c3d65] font-bold uppercase tracking-wider text-[9px] block">Colegiatura Profesional (COP)</span>
+                <p class="font-bold text-slate-800 mt-0.5">COP N°: {{ profileData()?.cop }}</p>
+              </div>
+              <div class="bg-emerald-50/50 p-3 rounded-xl border border-emerald-100 text-left text-xs">
+                <span class="text-emerald-800 font-bold uppercase tracking-wider text-[9px] block">Especialidad Clínica</span>
+                <p class="font-bold text-emerald-900 mt-0.5">{{ profileData()?.nombreEspecialidad || 'Odontología General' }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Right Column: Settings Form -->
+      <div class="lg:col-span-2 space-y-6">
+        <form (ngSubmit)="guardarCambios()" class="space-y-6">
+          
+          <!-- SECTION 1: Personal Details -->
+          <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 space-y-4">
+            <h3 class="font-bold text-[#0c3d65] text-base border-b border-slate-100 pb-2 flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#0c3d65] text-lg">person</span> Datos Personales
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-[#0c3d65] uppercase tracking-wider block">Nombres <strong class="text-red-500">*</strong></label>
+                <input type="text" [(ngModel)]="formNombres" name="nombres" required
+                  class="w-full px-3.5 py-2 border border-[#c2c7cf] rounded-xl text-xs focus:outline-none focus:border-[#0c3d65] bg-slate-50/20" />
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-[#0c3d65] uppercase tracking-wider block">Apellidos <strong class="text-red-500">*</strong></label>
+                <input type="text" [(ngModel)]="formApellidos" name="apellidos" required
+                  class="w-full px-3.5 py-2 border border-[#c2c7cf] rounded-xl text-xs focus:outline-none focus:border-[#0c3d65] bg-slate-50/20" />
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-[#0c3d65] uppercase tracking-wider block">Documento DNI <strong class="text-red-500">*</strong></label>
+                <input type="text" [(ngModel)]="formDni" name="dni" required (keypress)="onlyNumbers($event)" maxlength="8"
+                  class="w-full px-3.5 py-2 border border-[#c2c7cf] rounded-xl text-xs focus:outline-none focus:border-[#0c3d65] bg-slate-50/20" />
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: Contact Details -->
+          <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 space-y-4">
+            <h3 class="font-bold text-[#0c3d65] text-base border-b border-slate-100 pb-2 flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#0c3d65] text-lg">call</span> Datos de Contacto
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-[#0c3d65] uppercase tracking-wider block">Teléfono / Celular</label>
+                <input type="text" [(ngModel)]="formTelefono" name="telefono" (keypress)="onlyNumbers($event)" placeholder="Ej: 987654321"
+                  class="w-full px-3.5 py-2 border border-[#c2c7cf] rounded-xl text-xs focus:outline-none focus:border-[#0c3d65] bg-slate-50/20" />
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-[#0c3d65] uppercase tracking-wider block">Correo electrónico <strong class="text-red-500">*</strong></label>
+                <input type="email" [(ngModel)]="formCorreo" name="correo" required
+                  class="w-full px-3.5 py-2 border border-[#c2c7cf] rounded-xl text-xs focus:outline-none focus:border-[#0c3d65] bg-slate-50/20" />
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: Account Security (Password change) -->
+          <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 space-y-4">
+            <h3 class="font-bold text-[#0c3d65] text-base border-b border-slate-100 pb-2 flex items-center gap-2">
+              <span class="material-symbols-outlined text-[#0c3d65] text-lg">security</span> Cambio de Contraseña
+            </h3>
+            <p class="text-[10px] text-gray-500">Deja estos campos vacíos si no deseas modificar tu contraseña actual.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-[#0c3d65] uppercase tracking-wider block">Nueva Contraseña</label>
+                <input type="password" [(ngModel)]="formPassword" name="password" placeholder="Mínimo 6 caracteres"
+                  class="w-full px-3.5 py-2 border border-[#c2c7cf] rounded-xl text-xs focus:outline-none focus:border-[#0c3d65] bg-slate-50/20" />
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-[#0c3d65] uppercase tracking-wider block">Confirmar nueva contraseña</label>
+                <input type="password" [(ngModel)]="formConfirmPassword" name="confirmPassword" placeholder="Confirma tu contraseña"
+                  class="w-full px-3.5 py-2 border border-[#c2c7cf] rounded-xl text-xs focus:outline-none focus:border-[#0c3d65] bg-slate-50/20" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="flex justify-end">
+            <button type="submit" [disabled]="isSaving()"
+              class="w-full sm:w-auto bg-[#0c3d65] hover:bg-[#2b547e] text-white px-6 py-3 rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+              @if (isSaving()) {
+                <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              }
+              <span class="material-symbols-outlined text-sm">save</span>
+              <span>Guardar Cambios</span>
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+  }
+</div>

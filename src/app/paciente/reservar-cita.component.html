@@ -1,0 +1,355 @@
+<div class="space-y-6">
+
+  <!-- Toast Notification -->
+  @if (toastMessage()) {
+    <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 border animate-modal-in"
+      [class.bg-emerald-50]="toastType() === 'success'" [class.border-emerald-200]="toastType() === 'success'" [class.text-emerald-800]="toastType() === 'success'"
+      [class.bg-red-50]="toastType() === 'error'" [class.border-red-200]="toastType() === 'error'" [class.text-red-800]="toastType() === 'error'">
+      <span class="material-symbols-outlined text-lg">
+        {{ toastType() === 'success' ? 'check_circle' : 'error' }}
+      </span>
+      <span class="text-sm font-semibold">{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Header Card -->
+  <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 flex items-center gap-3">
+    <span class="material-symbols-outlined text-[#0c3d65] text-3xl">add_circle</span>
+    <div>
+      <h2 class="text-xl font-bold text-[#0c3d65]">Reservar Cita Odontológica</h2>
+      <p class="text-xs text-[#42474e]">Completa los siguientes pasos para programar tu visita médica.</p>
+    </div>
+  </div>
+
+  <!-- Wizard Step Indicator -->
+  <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-4">
+    <div class="flex items-center justify-between max-w-lg mx-auto relative">
+      <div class="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-gray-200 z-0"></div>
+      
+      <!-- Progress Bar Overlay -->
+      <div class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-[#0c3d65] z-0 transition-all duration-300"
+        [style.width.%]="((step() - 1) / 3) * 100"></div>
+
+      <!-- Step 1 -->
+      <div class="relative z-10 flex flex-col items-center gap-1.5">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 transition-all duration-300"
+          [class.bg-[#0c3d65]]="step() >= 1" [class.border-[#0c3d65]]="step() >= 1" [class.text-white]="step() >= 1"
+          [class.bg-white]="step() < 1" [class.border-gray-300]="step() < 1" [class.text-gray-400]="step() < 1">
+          1
+        </div>
+        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Especialidad</span>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="relative z-10 flex flex-col items-center gap-1.5">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 transition-all duration-300"
+          [class.bg-[#0c3d65]]="step() >= 2" [class.border-[#0c3d65]]="step() >= 2" [class.text-white]="step() >= 2"
+          [class.bg-white]="step() < 2" [class.border-gray-300]="step() < 2" [class.text-gray-400]="step() < 2">
+          2
+        </div>
+        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Odontólogo</span>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="relative z-10 flex flex-col items-center gap-1.5">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 transition-all duration-300"
+          [class.bg-[#0c3d65]]="step() >= 3" [class.border-[#0c3d65]]="step() >= 3" [class.text-white]="step() >= 3"
+          [class.bg-white]="step() < 3" [class.border-gray-300]="step() < 3" [class.text-gray-400]="step() < 3">
+          3
+        </div>
+        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Fecha y Hora</span>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="relative z-10 flex flex-col items-center gap-1.5">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 transition-all duration-300"
+          [class.bg-[#0c3d65]]="step() >= 4" [class.border-[#0c3d65]]="step() >= 4" [class.text-white]="step() >= 4"
+          [class.bg-white]="step() < 4" [class.border-gray-300]="step() < 4" [class.text-gray-400]="step() < 4">
+          4
+        </div>
+        <span class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Confirmar</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WIZARD CARD BODY -->
+  <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6">
+
+    <!-- STEP 1: SELECT ESPECIALIDAD -->
+    @if (step() === 1) {
+      <div class="space-y-4">
+        <h3 class="text-sm font-bold text-[#0c3d65] uppercase tracking-wider">Paso 1: Selecciona una Especialidad</h3>
+        @if (especialidades().length === 0) {
+          <p class="text-xs text-gray-500">No hay especialidades activas registradas en el sistema.</p>
+        } @else {
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            @for (esp of especialidades(); track esp.idEspecialidad) {
+              <div (click)="selectEspecialidad(esp.idEspecialidad)"
+                class="border border-[#c2c7cf] hover:border-[#0c3d65] rounded-xl p-5 cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 flex flex-col gap-2 group">
+                <div class="w-10 h-10 rounded-full bg-[#f0f3ff] text-[#0c3d65] flex items-center justify-center font-bold text-lg group-hover:bg-[#0c3d65] group-hover:text-white transition-all duration-200">
+                  <span class="material-symbols-outlined">workspace_premium</span>
+                </div>
+                <h4 class="font-bold text-[#111c2c] group-hover:text-[#0c3d65] transition-colors">{{ esp.nombre }}</h4>
+                <p class="text-xs text-[#42474e] truncate">{{ esp.descripcion || 'Sin descripción disponible' }}</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- STEP 2: SELECT MEDICO -->
+    @if (step() === 2) {
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+          <h3 class="text-sm font-bold text-[#0c3d65] uppercase tracking-wider">Paso 2: Selecciona tu Odontólogo</h3>
+          <button (click)="prevStep()" class="text-xs font-semibold text-[#0c3d65] flex items-center gap-1 hover:underline cursor-pointer">
+            <span class="material-symbols-outlined text-xs">arrow_back</span> Volver a Especialidades
+          </button>
+        </div>
+
+        @if (getMedicosFiltrados().length === 0) {
+          <div class="p-8 text-center bg-gray-50 rounded-xl">
+            <span class="material-symbols-outlined text-4xl text-gray-400 mb-2">person_off</span>
+            <p class="text-sm text-[#0c3d65] font-semibold">Lo sentimos, no hay médicos activos en esta especialidad.</p>
+            <button (click)="prevStep()" class="mt-3 bg-[#0c3d65] text-white px-4 py-2 rounded-xl text-xs font-semibold">Elegir otra especialidad</button>
+          </div>
+        } @else {
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            @for (medico of getMedicosFiltrados(); track medico.idMedico) {
+              <div (click)="selectMedico(medico)"
+                class="border border-[#c2c7cf] hover:border-[#0c3d65] rounded-xl p-4 cursor-pointer transition-all duration-200 hover:shadow-md flex items-center justify-between group">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-700 font-bold flex items-center justify-center">
+                    {{ medico.nombres.charAt(0).toUpperCase() }}
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-sm text-[#111c2c] group-hover:text-[#0c3d65] transition-colors">Dr. {{ medico.nombres }} {{ medico.apellidos }}</h4>
+                    <p class="text-xs text-gray-500">Colegiatura COP: {{ medico.cop }}</p>
+                  </div>
+                </div>
+                <span class="material-symbols-outlined text-gray-400 group-hover:text-[#0c3d65] transition-colors">chevron_right</span>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    }
+
+    <!-- STEP 3: FECHA Y HORA -->
+    @if (step() === 3) {
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+          <h3 class="text-sm font-bold text-[#0c3d65] uppercase tracking-wider">Paso 3: Elige la Fecha y Hora</h3>
+          <button (click)="prevStep()" class="text-xs font-semibold text-[#0c3d65] flex items-center gap-1 hover:underline cursor-pointer">
+            <span class="material-symbols-outlined text-xs">arrow_back</span> Volver a Odontólogos
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Calendar Selector -->
+          <div class="space-y-2">
+            <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider">Seleccionar Fecha</label>
+            <input type="date" [(ngModel)]="selectedFecha" (ngModelChange)="onFechaChange()" required
+              class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]" />
+            <p class="text-[10px] text-gray-400">Selecciona el día de tu consulta médica para consultar los slots libres.</p>
+          </div>
+
+          <!-- Slots Viewer -->
+          <div class="md:col-span-2 space-y-2">
+            <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider block">Horas Disponibles</label>
+            
+            @if (isLoadingSlots()) {
+              <div class="flex items-center gap-2 text-xs text-gray-500 py-4">
+                <div class="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+                <span>Consultando disponibilidad del Dr. {{ selectedMedico()?.nombres }}...</span>
+              </div>
+            } @else if (!selectedFecha()) {
+              <p class="text-xs text-gray-400 py-3">Selecciona una fecha a la izquierda para buscar horarios.</p>
+            } @else if (slots().length === 0) {
+              <div class="p-4 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200">
+                El odontólogo no tiene bloques de horarios activos o planificados para este día. Por favor elige otra fecha.
+              </div>
+            } @else {
+              <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                @for (s of slots(); track s.hora) {
+                  <button (click)="selectSlot(s)" [disabled]="!s.disponible"
+                    [class.bg-emerald-50]="s.disponible && selectedSlot() !== s"
+                    [class.text-emerald-700]="s.disponible && selectedSlot() !== s"
+                    [class.border-emerald-200]="s.disponible && selectedSlot() !== s"
+                    [class.bg-[#0c3d65]]="selectedSlot() === s"
+                    [class.text-white]="selectedSlot() === s"
+                    [class.border-[#0c3d65]]="selectedSlot() === s"
+                    [class.bg-gray-100]="!s.disponible"
+                    [class.text-gray-400]="!s.disponible"
+                    [class.border-gray-200]="!s.disponible"
+                    [class.opacity-50]="!s.disponible"
+                    class="py-2.5 px-2 text-center rounded-lg text-xs font-bold border transition-all duration-200 cursor-pointer disabled:cursor-not-allowed">
+                    {{ s.hora.substring(0, 5) }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-gray-100 flex justify-end">
+          <button (click)="goToStep4()" [disabled]="!selectedSlot()"
+            class="bg-[#0c3d65] hover:bg-[#2b547e] text-white px-6 py-2.5 rounded-xl font-semibold text-xs transition-colors cursor-pointer disabled:opacity-50 shadow-md">
+            Siguiente Paso: Confirmar
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- STEP 4: CONFIRMACIÓN Y MOTIVO -->
+    @if (step() === 4) {
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+          <h3 class="text-sm font-bold text-[#0c3d65] uppercase tracking-wider">Paso 4: Confirma los Detalles</h3>
+          <button (click)="prevStep()" class="text-xs font-semibold text-[#0c3d65] flex items-center gap-1 hover:underline cursor-pointer">
+            <span class="material-symbols-outlined text-xs">arrow_back</span> Volver a Fecha y Hora
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Summary card -->
+          <div class="bg-gray-50 border border-[#c2c7cf]/60 p-5 rounded-2xl space-y-3">
+            <h4 class="font-bold text-[#0c3d65] text-sm border-b border-gray-200 pb-2 flex items-center gap-2">
+              <span class="material-symbols-outlined text-base">task_alt</span> Resumen de Reserva
+            </h4>
+            <div class="text-xs text-gray-700 space-y-2">
+              <p><strong>Especialidad:</strong> 
+                @for (e of especialidades(); track e.idEspecialidad) {
+                  @if (e.idEspecialidad === selectedEspecialidadId()) { {{ e.nombre }} }
+                }
+              </p>
+              <p><strong>Odontólogo:</strong> Dr. {{ selectedMedico()?.nombres }} {{ selectedMedico()?.apellidos }}</p>
+              <p><strong>Colegiatura COP:</strong> {{ selectedMedico()?.cop }}</p>
+              <p><strong>Fecha de cita:</strong> {{ selectedSlot()?.fecha }}</p>
+              <p><strong>Hora:</strong> {{ selectedSlot()?.hora?.substring(0, 5) }}</p>
+            </div>
+          </div>
+
+          <!-- Motivo de consulta -->
+          <div class="space-y-2">
+            <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider">Motivo de tu Cita / Síntomas</label>
+            <textarea [(ngModel)]="formMotivo" rows="4" placeholder="Ej: Control de brackets, dolor en encías, limpieza dental rutinaria..."
+              class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]"></textarea>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-gray-100 flex gap-3">
+          <button (click)="prevStep()"
+            class="flex-1 bg-white border border-[#c2c7cf] text-gray-700 py-2.5 rounded-xl font-semibold text-xs hover:bg-gray-50 transition-colors cursor-pointer">
+            Volver a Editar
+          </button>
+          <button (click)="confirmarReserva()" [disabled]="isSubmitting()"
+            class="flex-1 bg-[#0c3d65] hover:bg-[#2b547e] text-white py-2.5 rounded-xl font-semibold text-xs transition-colors cursor-pointer disabled:opacity-50 shadow-md flex items-center justify-center gap-2">
+            @if (isSubmitting()) { <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> }
+            <span>Reservar Cita</span>
+          </button>
+        </div>
+      </div>
+    }
+
+  </div>
+
+  <!-- HISTORIAL / CITAS AGENDADAS DEL PACIENTE -->
+  <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm overflow-hidden">
+    <div class="p-6 border-b border-[#c2c7cf]/60 flex justify-between items-center">
+      <h3 class="font-bold text-[#0c3d65] text-lg flex items-center gap-2">
+        <span class="material-symbols-outlined">event</span> Historial de Mis Citas
+      </h3>
+      <button (click)="cargarMisCitas()" class="text-[#0c3d65] hover:text-[#2b547e] p-2 rounded-full hover:bg-gray-100 transition-colors">
+        <span class="material-symbols-outlined text-lg" [class.animate-spin]="isLoadingHistorial()">sync</span>
+      </button>
+    </div>
+
+    @if (isLoadingHistorial()) {
+      <div class="p-12 flex flex-col items-center justify-center gap-3">
+        <div class="w-8 h-8 border-4 border-[#0c3d65] border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-sm text-[#42474e]">Cargando tu historial...</p>
+      </div>
+    } @else if (citasHistorial().length === 0) {
+      <div class="p-12 text-center text-gray-500 text-xs">
+        <span class="material-symbols-outlined text-4xl text-gray-300 mb-2">event_note</span>
+        <p class="font-semibold text-gray-600">No tienes citas agendadas.</p>
+        <p class="text-gray-400 mt-1">Tu historial de consultas reservadas aparecerá aquí.</p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-gray-50 text-[11px] font-bold uppercase tracking-wider text-[#0c3d65] border-b border-[#c2c7cf]/60">
+              <th class="p-4">Fecha y Hora</th>
+              <th class="p-4">Médico</th>
+              <th class="p-4">Especialidad</th>
+              <th class="p-4">Motivo / Reprog.</th>
+              <th class="p-4">Estado</th>
+              <th class="p-4 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-[#c2c7cf]/40">
+            @for (c of citasHistorial(); track c.idCita) {
+              <tr class="hover:bg-gray-50/50 transition-colors">
+                <td class="p-4">
+                  <div class="flex flex-col">
+                    <span class="font-bold text-sm text-[#111c2c]">{{ c.fecha }}</span>
+                    <span class="text-xs font-semibold text-[#0c3d65] flex items-center gap-1 mt-0.5">
+                      <span class="material-symbols-outlined text-sm">schedule</span>
+                      {{ c.hora.substring(0, 5) }}
+                    </span>
+                  </div>
+                </td>
+                <td class="p-4">
+                  <span class="font-semibold text-sm text-[#111c2c]">Dr. {{ c.nombreMedico }}</span>
+                </td>
+                <td class="p-4">
+                  <span class="text-xs font-bold text-[#0c3d65] bg-[#dee8ff] px-2.5 py-0.5 rounded-full">{{ c.especialidadMedico }}</span>
+                </td>
+                <td class="p-4">
+                  <div class="flex flex-col">
+                    <span class="text-xs text-gray-700">{{ c.motivoCita }}</span>
+                    @if (c.notaPostergacion) {
+                      <span class="text-[10px] text-red-500 italic mt-0.5">Reprogramación: "{{ c.notaPostergacion }}"</span>
+                    }
+                  </div>
+                </td>
+                <td class="p-4">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold"
+                    [class.bg-amber-50]="c.estadoCita === 'PENDIENTE'" [class.text-amber-700]="c.estadoCita === 'PENDIENTE'"
+                    [class.bg-emerald-50]="c.estadoCita === 'ATENDIDA'" [class.text-emerald-700]="c.estadoCita === 'ATENDIDA'"
+                    [class.bg-red-50]="c.estadoCita === 'CANCELADA'" [class.text-red-700]="c.estadoCita === 'CANCELADA'"
+                    [class.bg-violet-50]="c.estadoCita === 'POSTERGADA'" [class.text-violet-700]="c.estadoCita === 'POSTERGADA'">
+                    {{ c.estadoCita }}
+                  </span>
+                </td>
+                <td class="p-4 text-right">
+                  <div class="flex justify-end gap-1.5">
+                    @if (c.estadoCita === 'PENDIENTE') {
+                      <button (click)="cancelarCita(c.idCita)" title="Cancelar reserva"
+                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer flex items-center justify-center">
+                        <span class="material-symbols-outlined text-[18px]">block</span>
+                      </button>
+                    } @else if (c.estadoCita === 'ATENDIDA') {
+                      <button (click)="verReceta(c.idCita)" title="Ver Detalle Clínico"
+                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer flex items-center gap-1 text-xs font-semibold">
+                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                        <span>Ver Detalle</span>
+                      </button>
+                    } @else {
+                      <span class="text-xs text-gray-400 font-medium">— Sin acciones —</span>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+
+</div>

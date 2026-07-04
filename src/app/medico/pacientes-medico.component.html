@@ -1,0 +1,294 @@
+<div class="space-y-6">
+
+  <!-- Toast Notification -->
+  @if (toastMessage()) {
+    <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 border animate-modal-in"
+      [class.bg-emerald-50]="toastType() === 'success'" [class.border-emerald-200]="toastType() === 'success'" [class.text-emerald-800]="toastType() === 'success'"
+      [class.bg-red-50]="toastType() === 'error'" [class.border-red-200]="toastType() === 'error'" [class.text-red-800]="toastType() === 'error'">
+      <span class="material-symbols-outlined text-lg">
+        {{ toastType() === 'success' ? 'check_circle' : 'error' }}
+      </span>
+      <span class="text-sm font-semibold">{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Header Section -->
+  <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-[#0c3d65] text-3xl">group</span>
+      <div>
+        <h2 class="text-xl font-bold text-[#0c3d65]">Mis Pacientes Atendidos</h2>
+        <p class="text-xs text-[#42474e]">Visualiza la información de los pacientes que han reservado citas contigo y consulta su historial clínico.</p>
+      </div>
+    </div>
+    <div class="w-full md:w-72 relative">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg">search</span>
+      <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()" placeholder="Buscar por Nombre o DNI..."
+        class="w-full pl-9 pr-4 py-2 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]" />
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- PACIENTES LIST (Left Panel, occupies 2 columns if history is open, otherwise 3) -->
+    <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm overflow-hidden"
+      [class.lg:col-span-2]="selectedPaciente()" [class.lg:col-span-3]="!selectedPaciente()">
+      <div class="p-6 border-b border-[#c2c7cf]/60 flex items-center justify-between">
+        <h3 class="font-bold text-[#0c3d65] text-base flex items-center gap-2">
+          <span class="material-symbols-outlined">patient_list</span> Pacientes Registrados
+        </h3>
+        <button (click)="cargarPacientes()" class="text-[#0c3d65] hover:text-[#2b547e] p-2 rounded-full hover:bg-gray-100 transition-colors">
+          <span class="material-symbols-outlined text-lg" [class.animate-spin]="isLoading()">sync</span>
+        </button>
+      </div>
+
+      @if (isLoading()) {
+        <div class="p-12 flex flex-col items-center justify-center gap-3">
+          <div class="w-8 h-8 border-4 border-[#0c3d65] border-t-transparent rounded-full animate-spin"></div>
+          <p class="text-sm text-[#42474e]">Cargando pacientes...</p>
+        </div>
+      } @else if (filteredPacientes().length === 0) {
+        <div class="p-12 text-center text-gray-500 text-xs">
+          <span class="material-symbols-outlined text-5xl text-gray-300 mb-2">person_off</span>
+          <p class="font-semibold text-gray-600">No se encontraron pacientes.</p>
+          <p class="text-gray-400 mt-1">El listado se llena de forma automática a medida que los pacientes reserven citas contigo.</p>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-gray-50 text-[11px] font-bold uppercase tracking-wider text-[#0c3d65] border-b border-[#c2c7cf]/60">
+                <th class="p-4">Paciente</th>
+                <th class="p-4">DNI</th>
+                <th class="p-4">Teléfono</th>
+                <th class="p-4">Correo</th>
+                <th class="p-4 text-right">Historial</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#c2c7cf]/40">
+              @for (p of filteredPacientes(); track p.idPaciente) {
+                <tr class="hover:bg-gray-50/50 transition-colors cursor-pointer"
+                  [class.bg-blue-50/40]="selectedPaciente()?.idPaciente === p.idPaciente"
+                  (click)="verHistorial(p)">
+                  <td class="p-4">
+                    <div class="flex items-center gap-2">
+                      <div class="w-8 h-8 rounded-full bg-blue-50 text-blue-700 font-bold flex items-center justify-center text-xs">
+                        {{ p.nombres.charAt(0).toUpperCase() }}
+                      </div>
+                      <span class="font-bold text-sm text-[#111c2c]">{{ p.nombres }} {{ p.apellidos }}</span>
+                    </div>
+                  </td>
+                  <td class="p-4">
+                    <span class="text-xs font-semibold text-gray-600">{{ p.dni }}</span>
+                  </td>
+                  <td class="p-4">
+                    <span class="text-xs text-gray-600 font-medium">{{ p.telefono || 'Sin teléfono' }}</span>
+                  </td>
+                  <td class="p-4">
+                    <span class="text-xs text-gray-600 font-medium">{{ p.correo }}</span>
+                  </td>
+                  <td class="p-4 text-right">
+                    <button class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex items-center justify-center ml-auto">
+                      <span class="material-symbols-outlined text-[18px]">history</span>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- PATIENT HISTORY PANEL (Right Sidebar panel, slides in when a patient is selected) -->
+    @if (selectedPaciente()) {
+      <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 flex flex-col gap-4 animate-modal-in self-start lg:col-span-1">
+        
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-blue-600">history</span>
+            <h3 class="font-bold text-[#0c3d65] text-base">Ficha del Paciente</h3>
+          </div>
+          <button (click)="cerrarHistorial()" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <!-- Paciente Info Card -->
+        <div class="bg-[#f0f3ff] p-4 rounded-xl border border-[#dee8ff] flex flex-col gap-1.5 text-xs text-slate-700">
+          <h4 class="font-bold text-sm text-[#0c3d65]">{{ selectedPaciente()?.nombres }} {{ selectedPaciente()?.apellidos }}</h4>
+          <p><strong>DNI:</strong> {{ selectedPaciente()?.dni }}</p>
+          <p><strong>Teléfono:</strong> {{ selectedPaciente()?.telefono || 'No registrado' }}</p>
+          <p><strong>Correo:</strong> {{ selectedPaciente()?.correo }}</p>
+        </div>
+
+        <!-- Appointment Timeline -->
+        <div class="space-y-3">
+          <h4 class="font-bold text-xs uppercase text-[#0c3d65] tracking-wider">Historial de Consultas</h4>
+
+          @if (isLoadingHistory()) {
+            <div class="flex items-center gap-2 text-xs text-gray-500 py-4">
+              <div class="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+              <span>Obteniendo historial clínico...</span>
+            </div>
+          } @else if (citasHistorial().length === 0) {
+            <p class="text-xs text-gray-400 py-2">No se registran citas pasadas o agendadas.</p>
+          } @else {
+            <div class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+              @for (c of citasHistorial(); track c.idCita) {
+                <div class="border border-[#c2c7cf]/40 hover:border-[#c2c7cf] rounded-xl p-3 bg-white flex flex-col gap-1.5 transition-all text-xs">
+                  <div class="flex justify-between items-center">
+                    <span class="font-bold text-[#0c3d65]">{{ c.fecha }}</span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold"
+                      [class.bg-amber-50]="c.estadoCita === 'PENDIENTE'" [class.text-amber-700]="c.estadoCita === 'PENDIENTE'"
+                      [class.bg-emerald-50]="c.estadoCita === 'ATENDIDA'" [class.text-emerald-700]="c.estadoCita === 'ATENDIDA'"
+                      [class.bg-red-50]="c.estadoCita === 'CANCELADA'" [class.text-red-700]="c.estadoCita === 'CANCELADA'"
+                      [class.bg-violet-50]="c.estadoCita === 'POSTERGADA'" [class.text-violet-700]="c.estadoCita === 'POSTERGADA'">
+                      {{ c.estadoCita }}
+                    </span>
+                  </div>
+                  <p class="text-slate-600 font-medium">
+                    <strong>Hora:</strong> {{ c.hora.substring(0, 5) }} 
+                  </p>
+                  <p class="text-slate-600 italic">
+                    <strong>Motivo:</strong> "{{ c.motivoCita || 'Limpieza / Control general' }}"
+                  </p>
+                  @if (c.notaPostergacion) {
+                    <p class="text-[10px] text-red-500">
+                      <strong>Nota Reprog:</strong> "{{ c.notaPostergacion }}"
+                    </p>
+                  }
+                  @if (c.estadoCita === 'ATENDIDA') {
+                    <button type="button" (click)="verFichaCitaAtendida(c)"
+                      class="text-[11px] text-blue-600 hover:text-blue-800 font-bold flex items-center gap-1 mt-1 cursor-pointer hover:underline self-start">
+                      <span class="material-symbols-outlined text-sm">receipt_long</span>
+                      <span>Ver Receta y Ficha</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+  </div>
+
+  <!-- MODAL: VISUALIZAR ATENCIÓN CLÍNICA Y RECETA (PARA MÉDICO) -->
+  @if (showVerAtencionModal()) {
+    <div class="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 flex flex-col gap-4 animate-modal-in max-h-[90vh] overflow-y-auto">
+        
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3 flex-shrink-0">
+          <h3 class="font-bold text-[#0c3d65] text-lg flex items-center gap-2">
+            <span class="material-symbols-outlined text-blue-600">receipt_long</span> Ficha y Receta Médica
+          </h3>
+          <button (click)="cerrarVerAtencion()" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        @if (isLoadingVerAtencion()) {
+          <div class="p-12 flex flex-col items-center justify-center gap-3">
+            <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-xs text-gray-500">Buscando receta registrada...</p>
+          </div>
+        } @else {
+          <!-- Ficha Layout (Estilo Recetario Odontológico) -->
+          <div class="border-2 border-slate-200 rounded-2xl p-6 bg-white space-y-6 relative overflow-hidden" id="receta-printable">
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-[#0c3d65]"></div>
+            
+            <!-- Cabecera de la Clínica -->
+            <div class="flex justify-between items-start border-b border-slate-100 pb-4">
+              <div>
+                <h2 class="font-black text-lg text-[#0c3d65] leading-none tracking-tight">MR DENTIST</h2>
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest mt-1">Clínica Dental Especializada</p>
+              </div>
+              <div class="text-right text-[10px] text-slate-500">
+                <p>Fecha de atención: <strong>{{ atencionVisualizada()?.fechaAtencion?.substring(0, 10) }}</strong></p>
+                <p>Cita ID: #{{ atencionVisualizada()?.idCita }}</p>
+              </div>
+            </div>
+
+            <!-- Datos Paciente / Médico -->
+            <div class="grid grid-cols-2 gap-4 text-xs text-slate-700 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Paciente</p>
+                <p class="font-bold text-slate-800">{{ atencionVisualizada()?.pacienteNombre }}</p>
+                <p class="mt-0.5">DNI: {{ atencionVisualizada()?.pacienteDni }}</p>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Odontólogo Tratante</p>
+                <p class="font-bold text-slate-800">Dr. {{ atencionVisualizada()?.medicoNombre }}</p>
+                <p class="mt-0.5">N° Colegiatura COP: {{ atencionVisualizada()?.medicoCop }}</p>
+              </div>
+            </div>
+
+            <!-- Ficha Clínica (Diagnóstico / Tratamiento) -->
+            <div class="space-y-3">
+              <h4 class="font-bold text-xs uppercase text-[#0c3d65] tracking-wider border-b border-slate-100 pb-1">1. Registro de Atención</h4>
+              <div class="text-xs text-slate-700 grid grid-cols-1 gap-2.5">
+                <p><strong>Diagnóstico:</strong> {{ atencionVisualizada()?.diagnostico }}</p>
+                <p><strong>Tratamiento:</strong> {{ atencionVisualizada()?.tratamiento }}</p>
+                @if (atencionVisualizada()?.observaciones) {
+                  <p><strong>Observaciones:</strong> {{ atencionVisualizada()?.observaciones }}</p>
+                }
+              </div>
+            </div>
+
+            <!-- Receta Médica -->
+            @if (atencionVisualizada()?.receta) {
+              <div class="space-y-3 pt-2">
+                <h4 class="font-bold text-xs uppercase text-[#0c3d65] tracking-wider border-b border-slate-100 pb-1">2. Receta Médica (Rp.)</h4>
+                <div class="border border-slate-100 rounded-xl overflow-hidden">
+                  <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-100">
+                        <th class="p-2">Medicamento</th>
+                        <th class="p-2">Dosis</th>
+                        <th class="p-2">Frecuencia</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                      @for (m of atencionVisualizada()?.receta?.detalles; track m.idDetalle) {
+                        <tr>
+                          <td class="p-2 font-semibold text-slate-800">{{ m.medicamento }}</td>
+                          <td class="p-2 text-slate-600">{{ m.dosis }}</td>
+                          <td class="p-2 text-slate-600">{{ m.frecuencia }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+                @if (atencionVisualizada()?.receta?.indicacionesGenerales) {
+                  <p class="text-xs text-slate-600 italic">
+                    <strong>Indicaciones:</strong> "{{ atencionVisualizada()?.receta?.indicacionesGenerales }}"
+                  </p>
+                }
+              </div>
+            }
+
+            <!-- Firma Médica -->
+            <div class="pt-8 flex flex-col items-center justify-center">
+              <div class="w-40 border-b border-slate-400 mb-1"></div>
+              <p class="text-xs font-bold text-slate-800">Dr. {{ atencionVisualizada()?.medicoNombre }}</p>
+              <p class="text-[10px] text-slate-400">COP: {{ atencionVisualizada()?.medicoCop }} · Odontólogo Tratante</p>
+            </div>
+          </div>
+        }
+
+        <div class="pt-2 flex gap-3 flex-shrink-0">
+          <button (click)="cerrarVerAtencion()"
+            class="flex-grow bg-[#0c3d65] hover:bg-[#2b547e] text-white py-2.5 rounded-xl font-bold text-xs transition-colors cursor-pointer text-center">
+            Cerrar Ficha
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>

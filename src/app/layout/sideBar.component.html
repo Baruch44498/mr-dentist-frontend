@@ -1,0 +1,59 @@
+<aside class="w-64 h-screen bg-[#0c3d65] text-white flex flex-col justify-between border-r border-[#2b547e] shadow-xl fixed left-0 top-0 z-30">
+  
+  <!-- Header / Brand -->
+  <div class="p-6 border-b border-[#2b547e] flex items-center gap-3">
+    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-[#dee8ff]/30 shadow-md bg-white flex-shrink-0">
+      <img src="mr_dentist.jpg" alt="Logo" class="w-full h-full object-cover">
+    </div>
+    <div>
+      <h2 class="font-bold text-lg leading-none text-[#dee8ff]">Mr Dentist</h2>
+      <span class="text-xs text-[#a1c8f9]/70">Centro Odontológico</span>
+    </div>
+  </div>
+
+  <!-- User Profile Section -->
+  <div class="px-6 py-4 border-b border-[#2b547e] bg-[#2b547e]/20">
+    <div class="flex items-center gap-3">
+      <!-- Avatar Badge -->
+      <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[#3a6470] to-[#39618c] flex items-center justify-center font-bold text-white shadow-sm border border-[#dee8ff]/20">
+        {{ userName.charAt(0).toUpperCase() }}
+      </div>
+      <div class="overflow-hidden">
+        <h3 class="text-sm font-semibold truncate text-[#f9f9ff]">{{ userName }}</h3>
+        <span class="inline-block mt-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-[#a1c8f9]/20 text-[#a1c8f9]">
+          {{ userRole || 'Paciente' }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav class="flex-grow py-6 px-4 space-y-1.5 overflow-y-auto">
+    @for (item of sideBar; track item.path) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="bg-[#2b547e] text-white font-medium border-l-4 border-[#a1c8f9]"
+        class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-[#a1c8f9]/90 hover:text-white hover:bg-[#2b547e]/50 transition-all duration-200 group"
+      >
+        <span class="material-symbols-outlined text-[22px] text-[#a1c8f9] group-hover:text-white transition-colors">
+          {{ item.icon }}
+        </span>
+        <span>{{ item.nameButton }}</span>
+      </a>
+    }
+  </nav>
+
+  <!-- Footer / Logout -->
+  <div class="p-4 border-t border-[#2b547e] bg-[#001d36]/30">
+    <button
+      (click)="logout()"
+      class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold text-red-200 hover:text-white hover:bg-[#ba1a1a]/80 transition-all duration-200 cursor-pointer"
+    >
+      <span class="material-symbols-outlined text-[22px]">
+        logout
+      </span>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
+
+</aside>

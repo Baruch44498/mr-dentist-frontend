@@ -1,0 +1,271 @@
+/* Global Styles - Mr Dentist */
+@import 'tailwindcss';
+
+@theme {
+  --color-primary: #0c3d65;
+  --color-primary-container: #2b547e;
+  --color-primary-fixed: #d1e4ff;
+  --color-primary-fixed-dim: #a3cafa;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #a1c8f9;
+  --color-on-primary-fixed: #001d36;
+  --color-on-primary-fixed-variant: #1e4972;
+  --color-inverse-primary: #a3cafa;
+
+  --color-secondary: #3a6470;
+  --color-secondary-container: #beeaf8;
+  --color-secondary-fixed: #beeaf8;
+  --color-secondary-fixed-dim: #a3cddb;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #416a77;
+  --color-on-secondary-fixed: #001f27;
+  --color-on-secondary-fixed-variant: #214c58;
+
+  --color-tertiary: #363c3e;
+  --color-tertiary-container: #4d5356;
+  --color-tertiary-fixed: #dee3e6;
+  --color-tertiary-fixed-dim: #c2c7ca;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #c1c6c9;
+  --color-on-tertiary-fixed: #171c1f;
+  --color-on-tertiary-fixed-variant: #42484a;
+
+  --color-surface: #f9f9ff;
+  --color-surface-dim: #cfdaf1;
+  --color-surface-bright: #f9f9ff;
+  --color-surface-tint: #39618c;
+  --color-surface-variant: #d8e3fa;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f0f3ff;
+  --color-surface-container: #e7eeff;
+  --color-surface-container-high: #dee8ff;
+  --color-surface-container-highest: #d8e3fa;
+  --color-on-surface: #111c2c;
+  --color-on-surface-variant: #42474e;
+  --color-inverse-surface: #263142;
+  --color-inverse-on-surface: #ebf1ff;
+
+  --color-outline: #73777f;
+  --color-outline-variant: #c2c7cf;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --color-background: #f9f9ff;
+  --color-on-background: #111c2c;
+
+  --font-sans: 'Inter', sans-serif;
+  --font-family-inter: 'Inter', sans-serif;
+
+  --border-radius-DEFAULT: 0.25rem;
+  --border-radius-lg: 0.5rem;
+  --border-radius-xl: 0.75rem;
+  --border-radius-full: 9999px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  margin: 0;
+  padding: 0;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface-container-low);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-outline-variant);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-outline);
+}
+
+/* Modal animation */
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-in {
+  animation: modal-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─── Global Print Styles matching MantenimientoFrontend ─── */
+.print-only-receipt {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
+  }
+  
+  body, html, main, section, .min-h-screen {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10pt;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  
+  .screen-content, 
+  app-sideBar, 
+  header, 
+  .print\:hidden,
+  .toast,
+  button {
+    display: none !important;
+  }
+  
+  .print-only-receipt {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .receipt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    font-family: sans-serif;
+  }
+
+  .receipt-company h2 {
+    font-size: 14pt;
+    font-weight: 700;
+    color: #000;
+    margin: 0 0 3px 0;
+  }
+
+  .receipt-company p {
+    font-size: 8.5pt;
+    color: #333;
+    margin: 0 0 2px 0;
+  }
+
+  .receipt-doc-details {
+    text-align: right;
+    font-family: sans-serif;
+  }
+
+  .receipt-doc-details h3 {
+    font-size: 10pt;
+    margin: 0 0 3px 0;
+    color: #333;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .receipt-code {
+    font-size: 16pt;
+    font-weight: bold;
+    color: #000;
+    margin: 0;
+  }
+
+  .receipt-status {
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: #333;
+    display: block;
+    margin-top: 2px;
+  }
+
+  hr {
+    border: none;
+    border-top: 1.5px solid #000;
+    margin: 12px 0;
+  }
+
+  .receipt-metadata-grid-ot {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    font-size: 8.5pt;
+    margin: 12px 0;
+    font-family: sans-serif;
+  }
+
+  h4 {
+    font-size: 9.5pt;
+    font-weight: 700;
+    margin: 15px 0 5px 0;
+    text-transform: uppercase;
+    color: #000;
+    letter-spacing: 0.5px;
+    font-family: sans-serif;
+  }
+
+  .receipt-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 8.5pt;
+    font-family: sans-serif;
+  }
+
+  .receipt-table th {
+    border-bottom: 1.5px solid #000;
+    padding: 6px 5px;
+    font-weight: bold;
+    text-align: left;
+    background: transparent !important;
+    color: #000 !important;
+  }
+
+  .receipt-table td {
+    border-bottom: 0.5px solid #ccc;
+    padding: 6px 5px;
+    color: #000 !important;
+  }
+
+  .receipt-signatures {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 50px;
+    margin-top: 60px;
+    text-align: center;
+    font-family: sans-serif;
+  }
+
+  .signature-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .signature-line .line {
+    width: 220px;
+    border-top: 1px solid #000;
+    margin-bottom: 4px;
+  }
+
+  .signature-line span {
+    font-size: 7.5pt;
+    color: #333;
+  }
+}

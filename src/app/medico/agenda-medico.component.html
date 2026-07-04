@@ -1,0 +1,606 @@
+<div class="space-y-6">
+
+  <!-- Toast Notification -->
+  @if (toastMessage()) {
+    <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 border animate-modal-in"
+      [class.bg-emerald-50]="toastType() === 'success'" [class.border-emerald-200]="toastType() === 'success'" [class.text-emerald-800]="toastType() === 'success'"
+      [class.bg-red-50]="toastType() === 'error'" [class.border-red-200]="toastType() === 'error'" [class.text-red-800]="toastType() === 'error'">
+      <span class="material-symbols-outlined text-lg">
+        {{ toastType() === 'success' ? 'check_circle' : 'error' }}
+      </span>
+      <span class="text-sm font-semibold">{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Header Section with Navigation Tabs -->
+  <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-[#0c3d65] text-3xl">calendar_today</span>
+      <div>
+        <h2 class="text-xl font-bold text-[#0c3d65]">Gestión de Agenda Clínica</h2>
+        <p class="text-xs text-[#42474e]">Organiza tus citas diarias y planea tus horarios de consulta.</p>
+      </div>
+    </div>
+    <div class="flex bg-gray-100 p-1 rounded-xl border border-gray-200">
+      <button (click)="activeTab.set('citas')" 
+        [class.bg-white]="activeTab() === 'citas'" 
+        [class.shadow-sm]="activeTab() === 'citas'"
+        [class.text-[#0c3d65]]="activeTab() === 'citas'"
+        class="px-4 py-2 text-xs font-bold rounded-lg cursor-pointer transition-all duration-200 text-gray-500 hover:text-[#0c3d65]">
+        Citas Programadas
+      </button>
+      <button (click)="activeTab.set('horarios')" 
+        [class.bg-white]="activeTab() === 'horarios'" 
+        [class.shadow-sm]="activeTab() === 'horarios'"
+        [class.text-[#0c3d65]]="activeTab() === 'horarios'"
+        class="px-4 py-2 text-xs font-bold rounded-lg cursor-pointer transition-all duration-200 text-gray-500 hover:text-[#0c3d65]">
+        Horarios de Atención
+      </button>
+    </div>
+  </div>
+
+  <!-- TAB 1: CITAS PROGRAMADAS -->
+  @if (activeTab() === 'citas') {
+    <div class="grid grid-cols-1 gap-6">
+      
+      <!-- Appointment List -->
+      <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-[#c2c7cf]/60 flex items-center justify-between">
+          <h3 class="font-bold text-[#0c3d65] text-lg flex items-center gap-2">
+            <span class="material-symbols-outlined">patient_list</span> Lista de Citas
+          </h3>
+          <button (click)="cargarCitas()" class="text-[#0c3d65] hover:text-[#2b547e] p-2 rounded-full hover:bg-gray-100 cursor-pointer transition-colors">
+            <span class="material-symbols-outlined text-lg" [class.animate-spin]="isLoadingCitas()">sync</span>
+          </button>
+        </div>
+
+        @if (isLoadingCitas()) {
+          <div class="p-12 flex flex-col items-center justify-center gap-3">
+            <div class="w-8 h-8 border-4 border-[#0c3d65] border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-sm text-[#42474e]">Consultando tu agenda...</p>
+          </div>
+        } @else if (citas().length === 0) {
+          <div class="p-12 text-center">
+            <span class="material-symbols-outlined text-5xl text-gray-300 mb-2">event_busy</span>
+            <p class="text-sm font-semibold text-[#0c3d65]">No tienes citas registradas.</p>
+            <p class="text-xs text-[#42474e] mt-1">Los pacientes aparecerán aquí cuando reserven un horario.</p>
+          </div>
+        } @else {
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-gray-50 text-[11px] font-bold uppercase tracking-wider text-[#0c3d65] border-b border-[#c2c7cf]/60">
+                  <th class="p-4">Fecha y Hora</th>
+                  <th class="p-4">Paciente</th>
+                  <th class="p-4">Motivo / Especialidad</th>
+                  <th class="p-4">Estado</th>
+                  <th class="p-4 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#c2c7cf]/40">
+                @for (cita of citas(); track cita.idCita) {
+                  <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="p-4">
+                      <div class="flex flex-col">
+                        <span class="font-bold text-sm text-[#111c2c]">{{ cita.fecha }}</span>
+                        <span class="text-xs font-semibold text-[#0c3d65] flex items-center gap-1 mt-0.5">
+                          <span class="material-symbols-outlined text-sm">schedule</span>
+                          {{ cita.hora.substring(0, 5) }}
+                        </span>
+                      </div>
+                    </td>
+                    <td class="p-4">
+                      <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-blue-50 text-blue-700 font-bold text-xs flex items-center justify-center">
+                          {{ cita.nombrePaciente.charAt(0).toUpperCase() }}
+                        </div>
+                        <span class="font-medium text-sm text-[#111c2c]">{{ cita.nombrePaciente }}</span>
+                      </div>
+                    </td>
+                    <td class="p-4">
+                      <div class="flex flex-col">
+                        <span class="text-sm font-medium text-[#111c2c]">{{ cita.motivoCita || 'Consulta general' }}</span>
+                        <span class="text-[11px] text-[#73777f] font-semibold uppercase mt-0.5">{{ cita.especialidadMedico }}</span>
+                      </div>
+                    </td>
+                    <td class="p-4">
+                      <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold"
+                        [class.bg-amber-50]="cita.estadoCita === 'PENDIENTE'" [class.text-amber-700]="cita.estadoCita === 'PENDIENTE'"
+                        [class.bg-emerald-50]="cita.estadoCita === 'ATENDIDA'" [class.text-emerald-700]="cita.estadoCita === 'ATENDIDA'"
+                        [class.bg-red-50]="cita.estadoCita === 'CANCELADA'" [class.text-red-700]="cita.estadoCita === 'CANCELADA'"
+                        [class.bg-violet-50]="cita.estadoCita === 'POSTERGADA'" [class.text-violet-700]="cita.estadoCita === 'POSTERGADA'">
+                        <span class="w-1.5 h-1.5 rounded-full"
+                          [class.bg-amber-500]="cita.estadoCita === 'PENDIENTE'"
+                          [class.bg-emerald-500]="cita.estadoCita === 'ATENDIDA'"
+                          [class.bg-red-500]="cita.estadoCita === 'CANCELADA'"
+                          [class.bg-violet-500]="cita.estadoCita === 'POSTERGADA'"></span>
+                        {{ cita.estadoCita }}
+                      </span>
+                      @if (cita.notaPostergacion) {
+                        <p class="text-[10px] text-gray-400 mt-1 truncate max-w-[200px]" [title]="cita.notaPostergacion">
+                          Reprog: "{{ cita.notaPostergacion }}"
+                        </p>
+                      }
+                    </td>
+                    <td class="p-4 text-right">
+                      <div class="flex justify-end gap-1.5">
+                        @if (cita.estadoCita === 'PENDIENTE') {
+                          <button (click)="abrirAtencion(cita)" title="Marcar como Atendida"
+                            class="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors cursor-pointer flex items-center">
+                            <span class="material-symbols-outlined text-[18px]">check_box</span>
+                          </button>
+                          <button (click)="abrirReprogramar(cita)" title="Postergar/Reprogramar"
+                            class="p-2 text-violet-600 hover:bg-violet-50 rounded-lg transition-colors cursor-pointer flex items-center">
+                            <span class="material-symbols-outlined text-[18px]">update</span>
+                          </button>
+                          <button (click)="cancelarCita(cita)" title="Cancelar cita"
+                            class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer flex items-center">
+                            <span class="material-symbols-outlined text-[18px]">block</span>
+                          </button>
+                        } @else if (cita.estadoCita === 'ATENDIDA') {
+                          <button (click)="verFichaCitaAtendida(cita)" title="Ver Atención / Receta"
+                            class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors cursor-pointer flex items-center gap-1 text-xs font-semibold">
+                            <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+                            <span>Ver Receta</span>
+                          </button>
+                        } @else {
+                          <span class="text-xs text-gray-400 font-medium">— Sin acciones —</span>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- TAB 2: MI PLANIFICACIÓN DE HORARIOS -->
+  @if (activeTab() === 'horarios') {
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- New Schedule Creator Form -->
+      <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 flex flex-col gap-4 self-start">
+        <h3 class="font-bold text-[#0c3d65] text-lg flex items-center gap-2 border-b border-[#c2c7cf]/40 pb-3">
+          <span class="material-symbols-outlined">add_alarm</span> Programar Nuevo Bloque
+        </h3>
+        
+        <form (ngSubmit)="crearHorario()" class="space-y-4">
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider">Día de la Semana</label>
+            <select [(ngModel)]="formDia" name="dia"
+              class="w-full px-3 py-2.5 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65] focus:ring-1 focus:ring-[#0c3d65]">
+              @for (dia of diasSemana; track dia) {
+                <option [value]="dia">{{ dia }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider">Hora Inicio</label>
+              <input type="time" [(ngModel)]="formHoraInicio" name="inicio" required
+                class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]" />
+            </div>
+            <div class="space-y-1">
+              <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider">Hora Fin</label>
+              <input type="time" [(ngModel)]="formHoraFin" name="fin" required
+                class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]" />
+            </div>
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider">Duración de Cita (minutos)</label>
+            <select [(ngModel)]="formDuracion" name="duracion"
+              class="w-full px-3 py-2.5 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]">
+              <option [ngValue]="15">15 minutos</option>
+              <option [ngValue]="20">20 minutos</option>
+              <option [ngValue]="30">30 minutos (Recomendado)</option>
+              <option [ngValue]="45">45 minutos</option>
+              <option [ngValue]="60">60 minutos</option>
+            </select>
+          </div>
+
+          <button type="submit" [disabled]="isSavingHorario()"
+            class="w-full bg-[#0c3d65] hover:bg-[#2b547e] text-white py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 cursor-pointer transition-colors shadow-sm disabled:opacity-50">
+            @if (isSavingHorario()) { <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> }
+            <span>Crear Bloque</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Schedule Slots Table -->
+      <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm lg:col-span-2 overflow-hidden">
+        <div class="p-6 border-b border-[#c2c7cf]/60">
+          <h3 class="font-bold text-[#0c3d65] text-lg flex items-center gap-2">
+            <span class="material-symbols-outlined">schedule</span> Bloques de Disponibilidad Activos
+          </h3>
+        </div>
+
+        @if (isLoadingHorarios()) {
+          <div class="p-12 flex flex-col items-center justify-center gap-3">
+            <div class="w-8 h-8 border-4 border-[#0c3d65] border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-sm text-[#42474e]">Cargando horarios...</p>
+          </div>
+        } @else if (horarios().length === 0) {
+          <div class="p-12 text-center">
+            <span class="material-symbols-outlined text-5xl text-gray-300 mb-2">alarm_off</span>
+            <p class="text-sm font-semibold text-[#0c3d65]">No tienes horarios configurados.</p>
+            <p class="text-xs text-[#42474e] mt-1">Usa el formulario lateral para agregar tu disponibilidad semanal.</p>
+          </div>
+        } @else {
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-gray-50 text-[11px] font-bold uppercase tracking-wider text-[#0c3d65] border-b border-[#c2c7cf]/60">
+                  <th class="p-4">Día</th>
+                  <th class="p-4">Franja Horaria</th>
+                  <th class="p-4">Slots de Consulta</th>
+                  <th class="p-4">Estado</th>
+                  <th class="p-4 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[#c2c7cf]/40">
+                @for (h of horarios(); track h.idHorario) {
+                  <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="p-4">
+                      <span class="font-bold text-sm text-[#111c2c]">{{ h.diaSemana }}</span>
+                    </td>
+                    <td class="p-4">
+                      <span class="text-sm text-[#0c3d65] font-semibold bg-[#dee8ff] px-2.5 py-1 rounded-lg">
+                        {{ h.horaInicio.substring(0, 5) }} - {{ h.horaFin.substring(0, 5) }}
+                      </span>
+                    </td>
+                    <td class="p-4">
+                      <span class="text-xs font-semibold text-gray-600">Cada {{ h.duracionMinutos }} min</span>
+                    </td>
+                    <td class="p-4">
+                      <button (click)="toggleActivoHorario(h.idHorario)"
+                        [class.bg-emerald-50]="h.activo" [class.text-emerald-700]="h.activo"
+                        [class.bg-red-50]="!h.activo" [class.text-red-700]="!h.activo"
+                        class="px-2.5 py-0.5 rounded-full text-xs font-bold cursor-pointer transition-colors">
+                        {{ h.activo ? 'ACTIVO' : 'INACTIVO' }}
+                      </button>
+                    </td>
+                    <td class="p-4 text-right">
+                      <button (click)="eliminarHorario(h.idHorario)"
+                        class="p-2 text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- MODAL: REPROGRAMAR / POSTERGAR CITA -->
+  @if (showReprogramModal()) {
+    <div class="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 flex flex-col gap-4 animate-modal-in">
+        
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-violet-600">update</span>
+            <h3 class="font-bold text-[#0c3d65] text-lg">Postergar Cita</h3>
+          </div>
+          <button (click)="cerrarReprogramar()" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="bg-[#f0f3ff] p-3 rounded-xl text-xs text-slate-700 flex flex-col gap-1">
+          <p><strong>Paciente:</strong> {{ selectedCita()?.nombrePaciente }}</p>
+          <p><strong>Horario original:</strong> {{ selectedCita()?.fecha }} a las {{ selectedCita()?.hora?.substring(0, 5) }}</p>
+        </div>
+
+        <div class="space-y-4">
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider">Nueva Fecha</label>
+            <input type="date" [(ngModel)]="reprogFecha" (ngModelChange)="onReprogFechaChange()" required
+              class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]" />
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider">Nueva Hora (Slots Libres)</label>
+            @if (isLoadingReprogSlots()) {
+              <div class="flex items-center gap-2 text-xs text-gray-500 py-2">
+                <div class="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin"></div>
+                <span>Buscando slots disponibles en la fecha seleccionada...</span>
+              </div>
+            } @else if (reprogFecha() && reprogSlots().length === 0) {
+              <p class="text-xs text-red-500 py-1 font-semibold">No hay horarios libres definidos para este día.</p>
+            } @else {
+              <select [(ngModel)]="reprogHora" name="reprogHora"
+                class="w-full px-3 py-2.5 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]">
+                <option value="">— Seleccionar horario —</option>
+                @for (slot of reprogSlots(); track slot) {
+                  <option [value]="slot">{{ slot }}</option>
+                }
+              </select>
+            }
+          </div>
+
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider">Motivo de Reprogramación *</label>
+            <textarea [(ngModel)]="reprogNota" rows="3" placeholder="Ej: Motivos de salud / congreso odontológico"
+              class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]"></textarea>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-gray-100 flex gap-3">
+          <button (click)="cerrarReprogramar()"
+            class="flex-1 bg-white border border-[#c2c7cf] text-gray-700 py-2.5 rounded-xl font-semibold text-xs hover:bg-gray-50 transition-colors cursor-pointer">
+            Cancelar
+          </button>
+          <button (click)="guardarReprogramacion()" [disabled]="!reprogFecha() || !reprogHora() || !reprogNota().trim()"
+            class="flex-1 bg-violet-600 hover:bg-violet-700 text-white py-2.5 rounded-xl font-semibold text-xs transition-colors cursor-pointer disabled:opacity-50">
+            Confirmar Postergación
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- MODAL: REGISTRAR ATENCIÓN CLÍNICA Y RECETA -->
+  @if (showAtencionModal()) {
+    <div class="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 flex flex-col gap-4 animate-modal-in my-8 max-h-[90vh] overflow-y-auto">
+        
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3 flex-shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-emerald-600">check_box</span>
+            <h3 class="font-bold text-[#0c3d65] text-lg">Registrar Atención Odontológica</h3>
+          </div>
+          <button (click)="cerrarAtencion()" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="bg-[#f0f3ff] p-3.5 rounded-xl text-xs text-slate-700 flex flex-col sm:flex-row justify-between gap-2 flex-shrink-0">
+          <p><strong>Paciente:</strong> {{ citaParaAtender()?.nombrePaciente }}</p>
+          <p><strong>Cita:</strong> {{ citaParaAtender()?.fecha }} a las {{ citaParaAtender()?.hora?.substring(0, 5) }}</p>
+        </div>
+
+        <div class="space-y-4 flex-grow">
+          <!-- Diagnóstico -->
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider block">Diagnóstico del Paciente *</label>
+            <textarea [(ngModel)]="formDiagnostico" rows="3" placeholder="Ej: Gingivitis marginal crónica, caries dental penetrante en pieza 46"
+              class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]"></textarea>
+          </div>
+
+          <!-- Tratamiento -->
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider block">Procedimiento / Tratamiento Realizado *</label>
+            <textarea [(ngModel)]="formTratamiento" rows="3" placeholder="Ej: Profilaxis dental profunda, restauración estética con resina fotocurable"
+              class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]"></textarea>
+          </div>
+
+          <!-- Observaciones -->
+          <div class="space-y-1">
+            <label class="text-[11px] font-bold text-[#0c3d65] uppercase tracking-wider block">Observaciones Adicionales</label>
+            <textarea [(ngModel)]="formObservaciones" rows="2" placeholder="Ej: Se recomienda higiene bucal asistida y control en 6 meses"
+              class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-sm focus:outline-none focus:border-[#0c3d65]"></textarea>
+          </div>
+
+          <!-- Receta Médica Checkbox -->
+          <div class="flex items-center gap-2 pt-2 border-t border-gray-100">
+            <input type="checkbox" id="recetaCheck" [(ngModel)]="formGenerarReceta"
+              class="w-4 h-4 text-[#0c3d65] border-gray-300 rounded focus:ring-[#0c3d65] cursor-pointer" />
+            <label for="recetaCheck" class="text-sm font-bold text-[#0c3d65] cursor-pointer select-none">
+              Generar Receta Médica para el Paciente
+            </label>
+          </div>
+
+          <!-- Recipe Form Group -->
+          @if (formGenerarReceta()) {
+            <div class="bg-gray-50 border border-gray-200 rounded-2xl p-4 space-y-4 animate-modal-in">
+              <h4 class="font-bold text-xs uppercase text-[#0c3d65] tracking-wider border-b border-gray-200 pb-2">Prescripción de Medicamentos</h4>
+              
+              <!-- Agregar Medicina Inline Form -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 items-end">
+                <div class="space-y-1">
+                  <label class="text-[10px] font-bold text-gray-500 uppercase">Medicamento / Presentación</label>
+                  <input type="text" [(ngModel)]="medNombre" placeholder="Ej: Paracetamol 500mg"
+                    class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-xs focus:outline-none focus:border-[#0c3d65]" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[10px] font-bold text-gray-500 uppercase">Dosis / Cantidad</label>
+                  <input type="text" [(ngModel)]="medDosis" placeholder="Ej: 1 tableta / 10 unidades"
+                    class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-xs focus:outline-none focus:border-[#0c3d65]" />
+                </div>
+                <div class="space-y-1 flex gap-2">
+                  <div class="flex-grow space-y-1">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase">Frecuencia / Vía</label>
+                    <input type="text" [(ngModel)]="medFrecuencia" placeholder="Ej: cada 8h por 3 días"
+                      class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-xs focus:outline-none focus:border-[#0c3d65]" />
+                  </div>
+                  <button type="button" (click)="agregarMedicamento()"
+                    class="bg-[#0c3d65] hover:bg-[#2b547e] text-white p-2 rounded-xl flex items-center justify-center cursor-pointer h-[38px] w-[38px] flex-shrink-0 shadow-sm">
+                    <span class="material-symbols-outlined text-base">add</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Lista de medicamentos agregados -->
+              @if (medicamentos().length > 0) {
+                <div class="border border-gray-200 rounded-xl bg-white overflow-hidden">
+                  <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr class="bg-gray-100 text-gray-700 font-bold border-b border-gray-200">
+                        <th class="p-2.5">Medicamento</th>
+                        <th class="p-2.5">Dosis</th>
+                        <th class="p-2.5">Frecuencia</th>
+                        <th class="p-2.5 text-right">Quitar</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                      @for (m of medicamentos(); track $index) {
+                        <tr>
+                          <td class="p-2.5 font-semibold text-slate-800">{{ m.medicamento }}</td>
+                          <td class="p-2.5 text-slate-600">{{ m.dosis }}</td>
+                          <td class="p-2.5 text-slate-600">{{ m.frecuencia }}</td>
+                          <td class="p-2.5 text-right">
+                            <button type="button" (click)="quitarMedicamento($index)" class="text-red-500 hover:text-red-700">
+                              <span class="material-symbols-outlined text-base leading-none">delete</span>
+                            </button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+
+              <!-- Indicaciones Generales -->
+              <div class="space-y-1">
+                <label class="text-[10px] font-bold text-gray-500 uppercase">Indicaciones Generales de la Receta</label>
+                <textarea [(ngModel)]="formIndicacionesGenerales" rows="2" placeholder="Ej: Tomar abundante agua, evitar alimentos sólidos y calientes por 12 horas."
+                  class="w-full px-3 py-2 border border-[#c2c7cf] rounded-xl text-xs focus:outline-none focus:border-[#0c3d65]"></textarea>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="pt-3 border-t border-gray-100 flex gap-3 flex-shrink-0">
+          <button (click)="cerrarAtencion()"
+            class="flex-1 bg-white border border-[#c2c7cf] text-gray-700 py-2.5 rounded-xl font-semibold text-xs hover:bg-gray-50 transition-colors cursor-pointer">
+            Cancelar
+          </button>
+          <button (click)="guardarAtencion()" [disabled]="isSavingAtencion() || !formDiagnostico().trim() || !formTratamiento().trim() || (formGenerarReceta() && medicamentos().length === 0)"
+            class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-semibold text-xs transition-colors cursor-pointer disabled:opacity-50 shadow-md flex items-center justify-center gap-2">
+            @if (isSavingAtencion()) { <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div> }
+            <span>Registrar Atención y Firma</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- MODAL: VISUALIZAR ATENCIÓN CLÍNICA Y RECETA (VISTA DE IMPRESIÓN/FIRMA) -->
+  @if (showVerAtencionModal()) {
+    <div class="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4 backdrop-blur-sm overflow-y-auto">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 flex flex-col gap-4 animate-modal-in max-h-[90vh] overflow-y-auto">
+        
+        <div class="flex items-center justify-between border-b border-gray-100 pb-3 flex-shrink-0">
+          <h3 class="font-bold text-[#0c3d65] text-lg flex items-center gap-2">
+            <span class="material-symbols-outlined text-blue-600">receipt_long</span> Ficha y Receta Médica
+          </h3>
+          <button (click)="cerrarVerAtencion()" class="text-gray-400 hover:text-gray-600 cursor-pointer">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        @if (isLoadingVerAtencion()) {
+          <div class="p-12 flex flex-col items-center justify-center gap-3">
+            <div class="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-xs text-gray-500">Buscando receta registrada...</p>
+          </div>
+        } @else {
+          <!-- Ficha Layout (Estilo Recetario Odontológico) -->
+          <div class="border-2 border-slate-200 rounded-2xl p-6 bg-white space-y-6 relative overflow-hidden" id="receta-printable">
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-[#0c3d65]"></div>
+            
+            <!-- Cabecera de la Clínica -->
+            <div class="flex justify-between items-start border-b border-slate-100 pb-4">
+              <div>
+                <h2 class="font-black text-lg text-[#0c3d65] leading-none tracking-tight">MR DENTIST</h2>
+                <p class="text-[10px] text-slate-400 uppercase tracking-widest mt-1">Clínica Dental Especializada</p>
+              </div>
+              <div class="text-right text-[10px] text-slate-500">
+                <p>Fecha de atención: <strong>{{ atencionVisualizada()?.fechaAtencion?.substring(0, 10) }}</strong></p>
+                <p>Cita ID: #{{ atencionVisualizada()?.idCita }}</p>
+              </div>
+            </div>
+
+            <!-- Datos Paciente / Médico -->
+            <div class="grid grid-cols-2 gap-4 text-xs text-slate-700 bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Paciente</p>
+                <p class="font-bold text-slate-800">{{ atencionVisualizada()?.pacienteNombre }}</p>
+                <p class="mt-0.5">DNI: {{ atencionVisualizada()?.pacienteDni }}</p>
+              </div>
+              <div>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Odontólogo Tratante</p>
+                <p class="font-bold text-slate-800">Dr. {{ atencionVisualizada()?.medicoNombre }}</p>
+                <p class="mt-0.5">N° Colegiatura COP: {{ atencionVisualizada()?.medicoCop }}</p>
+              </div>
+            </div>
+
+            <!-- Ficha Clínica (Diagnóstico / Tratamiento) -->
+            <div class="space-y-3">
+              <h4 class="font-bold text-xs uppercase text-[#0c3d65] tracking-wider border-b border-slate-100 pb-1">1. Registro de Atención</h4>
+              <div class="text-xs text-slate-700 grid grid-cols-1 gap-2.5">
+                <p><strong>Diagnóstico:</strong> {{ atencionVisualizada()?.diagnostico }}</p>
+                <p><strong>Tratamiento:</strong> {{ atencionVisualizada()?.tratamiento }}</p>
+                @if (atencionVisualizada()?.observaciones) {
+                  <p><strong>Observaciones:</strong> {{ atencionVisualizada()?.observaciones }}</p>
+                }
+              </div>
+            </div>
+
+            <!-- Receta Médica -->
+            @if (atencionVisualizada()?.receta) {
+              <div class="space-y-3 pt-2">
+                <h4 class="font-bold text-xs uppercase text-[#0c3d65] tracking-wider border-b border-slate-100 pb-1">2. Receta Médica (Rp.)</h4>
+                <div class="border border-slate-100 rounded-xl overflow-hidden">
+                  <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                      <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-100">
+                        <th class="p-2">Medicamento</th>
+                        <th class="p-2">Dosis</th>
+                        <th class="p-2">Frecuencia</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                      @for (m of atencionVisualizada()?.receta?.detalles; track m.idDetalle) {
+                        <tr>
+                          <td class="p-2 font-semibold text-slate-800">{{ m.medicamento }}</td>
+                          <td class="p-2 text-slate-600">{{ m.dosis }}</td>
+                          <td class="p-2 text-slate-600">{{ m.frecuencia }}</td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+
+                @if (atencionVisualizada()?.receta?.indicacionesGenerales) {
+                  <p class="text-xs text-slate-600 italic">
+                    <strong>Indicaciones:</strong> "{{ atencionVisualizada()?.receta?.indicacionesGenerales }}"
+                  </p>
+                }
+              </div>
+            }
+
+            <!-- Firma Médica -->
+            <div class="pt-8 flex flex-col items-center justify-center">
+              <div class="w-40 border-b border-slate-400 mb-1"></div>
+              <p class="text-xs font-bold text-slate-800">Dr. {{ atencionVisualizada()?.medicoNombre }}</p>
+              <p class="text-[10px] text-slate-400">COP: {{ atencionVisualizada()?.medicoCop }} · Odontólogo Tratante</p>
+            </div>
+          </div>
+        }
+
+        <div class="pt-2 flex gap-3 flex-shrink-0">
+          <button (click)="cerrarVerAtencion()"
+            class="flex-grow bg-[#0c3d65] hover:bg-[#2b547e] text-white py-2.5 rounded-xl font-bold text-xs transition-colors cursor-pointer text-center">
+            Cerrar Ficha
+          </button>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>
+

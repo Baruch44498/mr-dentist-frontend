@@ -1,0 +1,301 @@
+<div class="space-y-6">
+  <!-- Toast Notification -->
+  @if (toastMessage()) {
+    <div class="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-xl flex items-center gap-2 border animate-modal-in"
+      [class.bg-emerald-50]="toastType() === 'success'" [class.border-emerald-200]="toastType() === 'success'" [class.text-emerald-800]="toastType() === 'success'"
+      [class.bg-red-50]="toastType() === 'error'" [class.border-red-200]="toastType() === 'error'" [class.text-red-800]="toastType() === 'error'">
+      <span class="material-symbols-outlined text-lg">
+        {{ toastType() === 'success' ? 'check_circle' : 'error' }}
+      </span>
+      <span class="text-sm font-semibold">{{ toastMessage() }}</span>
+    </div>
+  }
+
+  <!-- Screen-only Content Container -->
+  <div class="screen-content space-y-6">
+    <!-- Header Section with Back Button -->
+    <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <button (click)="regresar()" class="hover:bg-slate-100 text-[#0c3d65] p-2 rounded-full transition-colors flex items-center justify-center cursor-pointer border border-[#c2c7cf]/40 shadow-xs" title="Regresar">
+          <span class="material-symbols-outlined text-xl">arrow_back</span>
+        </button>
+        <div>
+          <h2 class="text-xl font-bold text-[#0c3d65] flex items-center gap-2">Detalle de Atención Médica</h2>
+          <p class="text-xs text-[#42474e]">Revisa toda la información detallada de tu consulta, diagnóstico, tratamiento y receta.</p>
+        </div>
+      </div>
+      
+      <div class="flex gap-2 w-full sm:w-auto">
+        @if (atencion()?.receta) {
+          <button (click)="imprimirReceta()" class="flex-grow sm:flex-grow-0 bg-white hover:bg-slate-50 text-[#0c3d65] border border-[#0c3d65] px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-xs">
+            <span class="material-symbols-outlined text-base">print</span>
+            <span>Imprimir Receta</span>
+          </button>
+        }
+        <button (click)="regresar()" class="flex-grow sm:flex-grow-0 bg-[#0c3d65] hover:bg-[#2b547e] text-white px-4 py-2 rounded-xl text-xs font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm">
+          <span class="material-symbols-outlined text-base">list</span>
+          <span>Ver Todo el Historial</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="bg-white rounded-2xl border border-[#c2c7cf] p-12 flex flex-col items-center justify-center gap-3 shadow-sm">
+        <div class="w-8 h-8 border-4 border-[#0c3d65] border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-sm text-[#42474e]">Cargando detalles de la atención...</p>
+      </div>
+    }
+
+    <!-- Error State -->
+    @if (errorMessage()) {
+      <div class="bg-white rounded-2xl border border-[#c2c7cf] p-12 text-center shadow-sm max-w-xl mx-auto">
+        <span class="material-symbols-outlined text-6xl text-red-400 mb-2">error</span>
+        <p class="text-base font-bold text-red-700">Ocurrió un inconveniente</p>
+        <p class="text-xs text-[#42474e] mt-1 mb-6">{{ errorMessage() }}</p>
+        <button (click)="regresar()" class="bg-[#0c3d65] hover:bg-[#2b547e] text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-sm">
+          Volver al Historial
+        </button>
+      </div>
+    }
+
+    <!-- Content (Only visible if loaded and no error) -->
+    @if (!isLoading() && atencion()) {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left Column: Cita & Historial Details -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <!-- CARD 1: Detalle de la Cita -->
+          <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 space-y-5 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-[#3a6470]"></div>
+            
+            <div class="border-b border-gray-100 pb-3 flex justify-between items-center">
+              <h3 class="font-bold text-[#0c3d65] text-base flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#3a6470]">event</span>
+                Información de la Cita Médica
+              </h3>
+              <span class="px-2 py-0.5 rounded font-bold text-[10px]"
+                [class.bg-amber-50]="cita()?.estadoCita === 'PENDIENTE'" [class.text-amber-700]="cita()?.estadoCita === 'PENDIENTE'"
+                [class.bg-emerald-50]="cita()?.estadoCita === 'ATENDIDA' || !cita()" [class.text-emerald-700]="cita()?.estadoCita === 'ATENDIDA' || !cita()"
+                [class.bg-red-50]="cita()?.estadoCita === 'CANCELADA'" [class.text-red-700]="cita()?.estadoCita === 'CANCELADA'">
+                {{ cita()?.estadoCita || 'ATENDIDA' }}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-[#42474e]">
+              <div class="space-y-1">
+                <span class="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Odontólogo</span>
+                <p class="font-bold text-slate-800 text-sm">Dr. {{ atencion()?.medicoNombre }}</p>
+                <p class="text-gray-500 font-medium">COP: {{ atencion()?.medicoCop }} · {{ cita()?.especialidadMedico || 'Odontología General' }}</p>
+              </div>
+
+              <div class="space-y-1">
+                <span class="text-slate-400 font-bold uppercase tracking-wider text-[10px]">Fecha y Hora Programada</span>
+                <p class="font-bold text-slate-800 text-sm">
+                  {{ atencion()?.fechaAtencion?.substring(0,10) }}
+                </p>
+                <p class="text-gray-500 font-medium">
+                  Hora de atención: {{ atencion()?.fechaAtencion?.substring(11, 16) }} hrs
+                </p>
+              </div>
+
+              @if (cita()?.motivoCita) {
+                <div class="space-y-1 md:col-span-2 bg-[#f0f3ff] p-3 rounded-xl border border-[#dee8ff]">
+                  <span class="text-[#0c3d65] font-bold uppercase tracking-wider text-[10px] block">Motivo de la Consulta</span>
+                  <p class="text-slate-700 font-medium mt-0.5">
+                    "{{ cita()?.motivoCita }}"
+                  </p>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- CARD 2: Registro Clínico de la Atención -->
+          <div class="bg-white rounded-2xl border border-[#c2c7cf] shadow-sm p-6 space-y-5 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-[#0c3d65]"></div>
+            
+            <div class="border-b border-gray-100 pb-3">
+              <h3 class="font-bold text-[#0c3d65] text-base flex items-center gap-2">
+                <span class="material-symbols-outlined text-[#0c3d65]">clinical_notes</span>
+                Registro Clínico e Historial
+              </h3>
+            </div>
+
+            <div class="space-y-4.5 text-xs text-[#42474e]">
+              <div class="space-y-1.5">
+                <span class="text-[#0c3d65] font-bold uppercase tracking-wider text-[10px] block">Diagnóstico Registrado</span>
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-slate-700 font-medium text-sm leading-relaxed whitespace-pre-line">
+                  {{ atencion()?.diagnostico }}
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <span class="text-[#0c3d65] font-bold uppercase tracking-wider text-[10px] block">Tratamiento Realizado</span>
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-slate-700 font-medium text-sm leading-relaxed whitespace-pre-line">
+                  {{ atencion()?.tratamiento }}
+                </div>
+              </div>
+
+              @if (atencion()?.observaciones) {
+                <div class="space-y-1.5">
+                  <span class="text-[#0c3d65] font-bold uppercase tracking-wider text-[10px] block">Observaciones del Odontólogo</span>
+                  <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 text-slate-700 font-medium italic text-sm leading-relaxed">
+                    "{{ atencion()?.observaciones }}"
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Receta Médica Preview Card (Screen Only) -->
+        <div class="lg:col-span-1">
+          <div class="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-6 space-y-6 relative overflow-hidden" id="receta-printable-screen">
+            <div class="absolute top-0 left-0 right-0 h-2 bg-[#0c3d65]"></div>
+            
+            <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+              <div class="flex items-center gap-2.5">
+                @if (showLogo()) {
+                  <div class="w-10 h-10 rounded-full overflow-hidden border border-[#0c3d65]/10 bg-white">
+                    <img src="mr_dentist.jpg" alt="Logo" class="w-full h-full object-cover">
+                  </div>
+                }
+                <div>
+                  <h2 class="font-black text-sm text-[#0c3d65] leading-none tracking-tight uppercase">{{ clinicName() }}</h2>
+                  <p class="text-[8px] text-slate-400 uppercase tracking-widest mt-0.5">{{ clinicSubtitle() }}</p>
+                </div>
+              </div>
+              <div class="text-right text-[10px] text-slate-500">
+                <p>Atención: #{{ atencion()?.idAtencion }}</p>
+                <p>{{ atencion()?.fechaAtencion?.substring(0, 10) }}</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-2 text-[10px] text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <div>
+                <span class="text-[8px] font-bold text-gray-400 uppercase tracking-wider block">Paciente</span>
+                <p class="font-bold text-slate-800">{{ atencion()?.pacienteNombre }}</p>
+              </div>
+              <div class="border-t border-slate-200/60 pt-2">
+                <span class="text-[8px] font-bold text-gray-400 uppercase tracking-wider block">Médico Tratante</span>
+                <p class="font-bold text-slate-800">Dr. {{ atencion()?.medicoNombre }}</p>
+              </div>
+            </div>
+
+            @if (atencion()?.receta) {
+              <div class="space-y-3">
+                <h4 class="font-bold text-[10px] uppercase text-[#0c3d65] tracking-wider border-b border-slate-100 pb-1">
+                  Medicamentos (Rp.)
+                </h4>
+                <table class="w-full text-left text-[10px]">
+                  <thead>
+                    <tr class="text-slate-500 font-bold border-b border-slate-100">
+                      <th class="pb-1.5">Med.</th>
+                      <th class="pb-1.5">Dosis</th>
+                      <th class="pb-1.5">Frec.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (m of atencion()?.receta?.detalles; track m.idDetalle) {
+                      <tr class="border-b border-slate-50">
+                        <td class="py-1.5 font-semibold text-slate-800">{{ m.medicamento }}</td>
+                        <td class="py-1.5 text-slate-600">{{ m.dosis }}</td>
+                        <td class="py-1.5 text-slate-600">{{ m.frecuencia }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            } @else {
+              <div class="py-6 text-center bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                <p class="text-[10px] font-bold text-[#0c3d65]">Sin Medicamentos</p>
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+
+  <!-- ── BLOQUE DE IMPRESIÓN EXCLUSIVO (Oculto en pantalla, visible al imprimir) ── -->
+  @if (!isLoading() && atencion()?.receta) {
+    <div class="print-only-receipt">
+      <div class="receipt-header">
+        <div class="receipt-company">
+          <h2>{{ clinicName() | uppercase }}</h2>
+          <p>{{ clinicSubtitle() }}</p>
+          <p>Dirección: {{ clinicAddress() }}</p>
+          <p>Teléfono: {{ clinicPhone() }} | Correo: {{ clinicEmail() }}</p>
+        </div>
+        <div class="receipt-doc-details">
+          <h3>RECETA MÉDICA</h3>
+          <h2 class="receipt-code">#{{ atencion()?.idAtencion }}</h2>
+          <span class="receipt-status">FECHA: {{ atencion()?.fechaAtencion?.substring(0, 10) }}</span>
+        </div>
+      </div>
+
+      <hr />
+      <h4>DATOS DEL PACIENTE Y MÉDICO</h4>
+      <div class="receipt-metadata-grid-ot">
+        <div><strong>Paciente:</strong> {{ atencion()?.pacienteNombre }}</div>
+        <div><strong>DNI Paciente:</strong> {{ atencion()?.pacienteDni }}</div>
+        <div><strong>Médico Tratante:</strong> Dr. {{ atencion()?.medicoNombre }}</div>
+        <div><strong>Colegiatura:</strong> COP N° {{ atencion()?.medicoCop }}</div>
+        @if (medico()) {
+          <div><strong>Teléfono Médico:</strong> {{ medico()?.telefono }}</div>
+          <div><strong>Correo Médico:</strong> {{ medico()?.correo }}</div>
+        }
+      </div>
+
+      <hr />
+      <h4>MEDICAMENTOS PRESCRITOS</h4>
+      <table class="receipt-table">
+        <thead>
+          <tr>
+            <th>Cód.</th>
+            <th>Descripción del Medicamento / Tratamiento</th>
+            <th>Dosis Recomendada</th>
+            <th>Frecuencia de Uso</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (m of atencion()?.receta?.detalles; track m.idDetalle; let idx = $index) {
+            <tr>
+              <td>{{ idx + 1 }}</td>
+              <td style="font-weight: 700;">{{ m.medicamento }}</td>
+              <td>{{ m.dosis }}</td>
+              <td>{{ m.frecuencia }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="4">No hay medicamentos prescritos en esta receta.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      @if (atencion()?.receta?.indicacionesGenerales) {
+        <div style="margin-top: 15px; font-size: 8pt; color: #333; line-height: 1.4;">
+          <strong>INDICACIONES GENERALES:</strong>
+          <p style="margin: 3px 0 0 0; font-style: italic;">{{ atencion()?.receta?.indicacionesGenerales }}</p>
+        </div>
+      }
+
+      <div class="receipt-signatures">
+        <div class="signature-line">
+          <div class="line"></div>
+          <span>Firma del Paciente</span>
+        </div>
+        <div class="signature-line">
+          <div class="line"></div>
+          <span>Dr. {{ atencion()?.medicoNombre }}</span>
+          <span style="font-size: 7pt; margin-top: 1px;">COP: {{ atencion()?.medicoCop }} (Firma y Sello)</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+<!-- Styles cleaned up - handled globally in styles.css -->

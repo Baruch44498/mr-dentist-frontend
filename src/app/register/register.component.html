@@ -1,0 +1,359 @@
+<section class="min-h-screen flex flex-col relative overflow-x-hidden bg-[#f9f9ff]">
+
+  <!-- Background dot pattern -->
+  <div class="fixed inset-0 z-0 pointer-events-none opacity-[0.04]"
+       style="background-image: radial-gradient(#0c3d65 1px, transparent 1px); background-size: 24px 24px;"></div>
+
+  <!-- Decorative gradient blobs -->
+  <div class="fixed top-0 right-0 w-96 h-96 rounded-full pointer-events-none z-0"
+       style="background: radial-gradient(circle, rgba(12,61,101,0.07) 0%, transparent 70%); transform: translate(30%, -30%);"></div>
+  <div class="fixed bottom-0 left-0 w-96 h-96 rounded-full pointer-events-none z-0"
+       style="background: radial-gradient(circle, rgba(58,100,112,0.07) 0%, transparent 70%); transform: translate(-30%, 30%);"></div>
+
+  <!-- Main Content -->
+  <main class="grow flex items-center justify-center px-4 py-10 md:px-16 relative z-10">
+
+    <!-- Register Card -->
+    <div class="bg-white rounded-2xl shadow-xl border border-[#c2c7cf] w-full max-w-2xl relative overflow-hidden">
+
+      <!-- Top accent bar -->
+      <div class="h-1.5 w-full"
+           style="background: linear-gradient(90deg, #0c3d65 0%, #3a6470 50%, #39618c 100%);"></div>
+
+      <div class="p-8">
+
+        <!-- Logo + Brand Header -->
+        <div class="flex flex-col items-center mb-8">
+          <div class="relative mb-4 group">
+            <div class="w-20 h-20 rounded-full overflow-hidden border-4 border-[#dee8ff] shadow-lg relative"
+                 style="box-shadow: 0 8px 24px rgba(12,61,101,0.18);">
+              <img
+                src="mr_dentist.jpg"
+                alt="Mr Dentist Logo"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+              />
+            </div>
+          </div>
+          <h1 class="text-2xl font-bold text-[#0c3d65] tracking-tight">Mr Dentist</h1>
+          <p class="text-sm text-[#42474e] mt-1">Centro Odontológico · Registro de Pacientes</p>
+          <div class="mt-3 flex items-center gap-2">
+            <div class="h-px w-10 bg-[#c2c7cf]"></div>
+            <span class="text-xs text-[#73777f] font-medium uppercase tracking-widest">Nueva Cuenta</span>
+            <div class="h-px w-10 bg-[#c2c7cf]"></div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <form (ngSubmit)="onSubmit()" class="space-y-5">
+
+          <!-- Row 1: DNI -->
+          <div>
+            <label class="block text-sm font-semibold text-[#111c2c] mb-1.5" for="reg-dni">
+              DNI / Documento de Identidad
+            </label>
+            <div class="relative group">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#73777f] text-[20px] transition-colors group-focus-within:text-[#0c3d65]">
+                badge
+              </span>
+              <input
+                id="reg-dni"
+                name="dni"
+                type="text"
+                [(ngModel)]="dni"
+                placeholder="Ej: 12345678"
+                required
+                maxlength="8"
+                minlength="8"
+                pattern="[0-9]{8}"
+                (keypress)="onlyNumbers($event)"
+                class="w-full pl-10 pr-4 py-2.5 bg-[#f9f9ff] border border-[#c2c7cf] rounded-lg text-[#111c2c] placeholder-[#73777f]/60 text-sm transition-all duration-200 outline-none focus:border-[#0c3d65] focus:ring-2 focus:ring-[#0c3d65]/20"
+              />
+            </div>
+          </div>
+
+          <!-- Row 2: Nombre + Apellido 1 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-[#111c2c] mb-1.5" for="reg-nombre">
+                Nombre
+              </label>
+              <div class="relative group">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#73777f] text-[20px] transition-colors group-focus-within:text-[#0c3d65]">
+                  person
+                </span>
+                <input
+                  id="reg-nombre"
+                  name="nombre"
+                  type="text"
+                  [(ngModel)]="nombre"
+                  placeholder="Juan"
+                  required
+                  class="w-full pl-10 pr-4 py-2.5 bg-[#f9f9ff] border border-[#c2c7cf] rounded-lg text-[#111c2c] placeholder-[#73777f]/60 text-sm transition-all duration-200 outline-none focus:border-[#0c3d65] focus:ring-2 focus:ring-[#0c3d65]/20"
+                />
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-[#111c2c] mb-1.5" for="reg-apellido1">
+                Primer Apellido
+              </label>
+              <div class="relative group">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#73777f] text-[20px] transition-colors group-focus-within:text-[#0c3d65]">
+                  family_restroom
+                </span>
+                <input
+                  id="reg-apellido1"
+                  name="apellido1"
+                  type="text"
+                  [(ngModel)]="apellido1"
+                  placeholder="García"
+                  required
+                  class="w-full pl-10 pr-4 py-2.5 bg-[#f9f9ff] border border-[#c2c7cf] rounded-lg text-[#111c2c] placeholder-[#73777f]/60 text-sm transition-all duration-200 outline-none focus:border-[#0c3d65] focus:ring-2 focus:ring-[#0c3d65]/20"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: Apellido 2 + Teléfono -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-[#111c2c] mb-1.5" for="reg-apellido2">
+                Segundo Apellido
+              </label>
+              <div class="relative group">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#73777f] text-[20px] transition-colors group-focus-within:text-[#0c3d65]">
+                  family_restroom
+                </span>
+                <input
+                  id="reg-apellido2"
+                  name="apellido2"
+                  type="text"
+                  [(ngModel)]="apellido2"
+                  placeholder="López"
+                  class="w-full pl-10 pr-4 py-2.5 bg-[#f9f9ff] border border-[#c2c7cf] rounded-lg text-[#111c2c] placeholder-[#73777f]/60 text-sm transition-all duration-200 outline-none focus:border-[#0c3d65] focus:ring-2 focus:ring-[#0c3d65]/20"
+                />
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-[#111c2c] mb-1.5" for="reg-telefono">
+                Teléfono
+              </label>
+              <div class="relative group">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#73777f] text-[20px] transition-colors group-focus-within:text-[#0c3d65]">
+                  phone
+                </span>
+                <input
+                  id="reg-telefono"
+                  name="telefono"
+                  type="tel"
+                  [(ngModel)]="telefono"
+                  placeholder="Ej: 600000000"
+                  required
+                  maxlength="9"
+                  minlength="9"
+                  pattern="[0-9]{9}"
+                  (keypress)="onlyNumbers($event)"
+                  class="w-full pl-10 pr-4 py-2.5 bg-[#f9f9ff] border border-[#c2c7cf] rounded-lg text-[#111c2c] placeholder-[#73777f]/60 text-sm transition-all duration-200 outline-none focus:border-[#0c3d65] focus:ring-2 focus:ring-[#0c3d65]/20"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 4: Correo -->
+          <div>
+            <label class="block text-sm font-semibold text-[#111c2c] mb-1.5" for="reg-correo">
+              Correo Electrónico
+            </label>
+            <div class="relative group">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#73777f] text-[20px] transition-colors group-focus-within:text-[#0c3d65]">
+                mail
+              </span>
+              <input
+                id="reg-correo"
+                name="correo"
+                type="email"
+                [(ngModel)]="correo"
+                placeholder="paciente&#64;ejemplo.com"
+                required
+                class="w-full pl-10 pr-4 py-2.5 bg-[#f9f9ff] border border-[#c2c7cf] rounded-lg text-[#111c2c] placeholder-[#73777f]/60 text-sm transition-all duration-200 outline-none focus:border-[#0c3d65] focus:ring-2 focus:ring-[#0c3d65]/20"
+              />
+            </div>
+          </div>
+
+          <!-- Row 5: Usuario -->
+          <div>
+            <label class="block text-sm font-semibold text-[#111c2c] mb-1.5" for="reg-usuario">
+              Nombre de Usuario
+            </label>
+            <div class="relative group">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#73777f] text-[20px] transition-colors group-focus-within:text-[#0c3d65]">
+                alternate_email
+              </span>
+              <input
+                id="reg-usuario"
+                name="usuario"
+                type="text"
+                [(ngModel)]="usuario"
+                placeholder="juan.garcia"
+                required
+                class="w-full pl-10 pr-4 py-2.5 bg-[#f9f9ff] border border-[#c2c7cf] rounded-lg text-[#111c2c] placeholder-[#73777f]/60 text-sm transition-all duration-200 outline-none focus:border-[#0c3d65] focus:ring-2 focus:ring-[#0c3d65]/20"
+              />
+            </div>
+          </div>
+
+          <!-- Row 6: Contraseña + Confirmar -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <div>
+              <label class="block text-sm font-semibold text-[#111c2c] mb-1.5" for="reg-password">
+                Contraseña
+              </label>
+              <div class="relative group">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#73777f] text-[20px] transition-colors group-focus-within:text-[#0c3d65]">
+                  lock
+                </span>
+                <input
+                  id="reg-password"
+                  name="contrasena"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  [(ngModel)]="contrasena"
+                  placeholder="Mínimo 8 caracteres"
+                  required
+                  minlength="8"
+                  class="w-full pl-10 pr-10 py-2.5 bg-[#f9f9ff] border border-[#c2c7cf] rounded-lg text-[#111c2c] placeholder-[#73777f]/60 text-sm transition-all duration-200 outline-none focus:border-[#0c3d65] focus:ring-2 focus:ring-[#0c3d65]/20"
+                />
+                <button
+                  type="button"
+                  (click)="togglePassword()"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-[#73777f] hover:text-[#0c3d65] transition-colors cursor-pointer"
+                >
+                  <span class="material-symbols-outlined text-[20px]">
+                    {{ showPassword() ? 'visibility_off' : 'visibility' }}
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-[#111c2c] mb-1.5" for="reg-confirm-password">
+                Confirmar Contraseña
+              </label>
+              <div class="relative group">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[20px] transition-colors"
+                      [class]="passwordMismatch ? 'text-[#ba1a1a]' : passwordMatch ? 'text-[#2b547e]' : 'text-[#73777f] group-focus-within:text-[#0c3d65]'">
+                  {{ passwordMatch ? 'lock_open' : 'lock' }}
+                </span>
+                <input
+                  id="reg-confirm-password"
+                  name="confirmarContrasena"
+                  [type]="showConfirmPassword() ? 'text' : 'password'"
+                  [(ngModel)]="confirmarContrasena"
+                  placeholder="Repite la contraseña"
+                  required
+                  class="w-full pl-10 pr-10 py-2.5 bg-[#f9f9ff] rounded-lg text-[#111c2c] placeholder-[#73777f]/60 text-sm transition-all duration-200 outline-none"
+                  [class]="passwordMismatch
+                    ? 'border-2 border-[#ba1a1a] focus:ring-2 focus:ring-[#ba1a1a]/20'
+                    : passwordMatch
+                    ? 'border-2 border-[#2b547e] focus:ring-2 focus:ring-[#2b547e]/20'
+                    : 'border border-[#c2c7cf] focus:border-[#0c3d65] focus:ring-2 focus:ring-[#0c3d65]/20'"
+                />
+                <button
+                  type="button"
+                  (click)="toggleConfirmPassword()"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-[#73777f] hover:text-[#0c3d65] transition-colors cursor-pointer"
+                >
+                  <span class="material-symbols-outlined text-[20px]">
+                    {{ showConfirmPassword() ? 'visibility_off' : 'visibility' }}
+                  </span>
+                </button>
+              </div>
+              <!-- Password match feedback -->
+              @if (passwordMismatch) {
+                <p class="mt-1.5 text-xs text-[#ba1a1a] flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px]">error</span>
+                  Las contraseñas no coinciden
+                </p>
+              }
+              @if (passwordMatch) {
+                <p class="mt-1.5 text-xs text-[#2b547e] flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[14px]">check_circle</span>
+                  Las contraseñas coinciden
+                </p>
+              }
+            </div>
+
+          </div>
+
+          <!-- Terms -->
+          <div class="pt-1">
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <input
+                id="accept-terms"
+                name="acceptTerms"
+                type="checkbox"
+                [(ngModel)]="acceptTerms"
+                required
+                class="mt-0.5 w-4 h-4 rounded border-[#c2c7cf] accent-[#0c3d65] cursor-pointer flex-shrink-0"
+              />
+              <span class="text-sm text-[#42474e] leading-relaxed">
+                Acepto los
+                <a href="#" class="text-[#0c3d65] font-semibold hover:underline">Términos de Servicio</a>
+                y la
+                <a href="#" class="text-[#0c3d65] font-semibold hover:underline">Política de Privacidad</a>
+                de Mr Dentist Centro Odontológico.
+              </span>
+            </label>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-1">
+            <button
+              id="register-submit"
+              type="submit"
+              [disabled]="isLoading() || passwordMismatch"
+              class="w-full flex justify-center items-center gap-2 py-3 px-6 rounded-lg text-sm font-semibold text-white transition-all duration-200 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+              style="background: linear-gradient(135deg, #0c3d65 0%, #2b547e 100%); box-shadow: 0 4px 14px rgba(12,61,101,0.35);"
+            >
+              @if (isLoading()) {
+                <span class="material-symbols-outlined text-[18px] animate-spin">autorenew</span>
+                <span>Registrando...</span>
+              } @else {
+                <span class="material-symbols-outlined text-[18px]">how_to_reg</span>
+                <span>Crear Cuenta de Paciente</span>
+              }
+            </button>
+          </div>
+
+        </form>
+
+        <!-- Login Link -->
+        <div class="mt-6 text-center">
+          <p class="text-sm text-[#42474e]">
+            ¿Ya tienes cuenta?
+            <a
+              routerLink="/login"
+              class="font-bold text-[#0c3d65] hover:text-[#2b547e] hover:underline decoration-[#0c3d65] ml-1 transition-all duration-200"
+            >
+              Iniciar sesión
+            </a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full py-6 px-4 md:px-16 flex flex-col md:flex-row justify-between items-center gap-4 bg-[#f0f3ff] border-t border-[#c2c7cf] relative z-10">
+    <div class="flex flex-col items-center md:items-start gap-1">
+      <span class="font-bold text-[#0c3d65] text-base">Mr Dentist</span>
+      <span class="text-xs text-[#42474e]">© 2024 Mr Dentist Centro Odontológico. Todos los derechos reservados.</span>
+    </div>
+    <nav class="flex flex-wrap justify-center gap-6">
+      <a class="text-xs text-[#42474e] hover:text-[#0c3d65] hover:underline transition-all duration-300" href="#">Política de Privacidad</a>
+      <a class="text-xs text-[#42474e] hover:text-[#0c3d65] hover:underline transition-all duration-300" href="#">Términos de Servicio</a>
+      <a class="text-xs text-[#42474e] hover:text-[#0c3d65] hover:underline transition-all duration-300" href="#">Soporte</a>
+      <a class="text-xs text-[#42474e] hover:text-[#0c3d65] hover:underline transition-all duration-300" href="#">Urgencias</a>
+    </nav>
+  </footer>
+
+</section>

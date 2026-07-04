@@ -1,0 +1,20 @@
+{
+  "admin": {
+    "role": "ADMIN",
+    "nombre": "Admin Mr Dentist",
+    "correo": "admin@mrdentist.com",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsIm5vbWJyZSI6IkFkbWluIE1yIERlbnRpc3QiLCJjb3JyZW8iOiJhZG1pbkBtcmRlbnRpc3QuY29tIiwicm9sZSI6IkFETUlOIn0.mocksignature"
+  },
+  "medico": {
+    "role": "MEDICO",
+    "nombre": "Dr. Carlos Perez",
+    "correo": "carlos.perez@mrdentist.com",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtZWRpY28iLCJub21icmUiOiJEci4gQ2FybG9zIFBlcmV6IiwiY29ycmVvIjoiY2FybG9zLnBlcmV6QG1yZGVudGlzdC5jb20iLCJyb2xlIjoiTUVESUNPIn0.mocksignature"
+  },
+  "paciente": {
+    "role": "PACIENTE",
+    "nombre": "Juan Lopez",
+    "correo": "juan.lopez@gmail.com",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJwYWNpZW50ZSIsIm5vbWJyZSI6Ikp1YW4gTG9wZXoiLCJjb3JyZW8iOiJqdWFuLmxvcGV6QGdtYWlsLmNvbSIsInJvbGUiOiJQQUNJRU5URSJ9.mocksignature"
+  }
+}
